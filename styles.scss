@@ -1,0 +1,522 @@
+/* ============================================================================
+   Government Methods — Monograph / Journal-TOC Landing
+   ============================================================================
+   DESIGN INTENT
+   - “Monograph title page” masthead + “journal contents page” list
+   - Light theme default (off-grey paper)
+   - Optional dark theme via html[data-theme="dark"] (user toggle)
+   - Hover behavior: ONLY item titles brighten
+       - Light mode: blue
+       - Dark mode: yellow
+   - Typography: serif for titles, sans for descriptive text
+
+   YOU CONTROL MOST THINGS VIA TOKENS IN:
+     1) :root  (light theme)
+     2) html[data-theme="dark"] (dark theme)
+   ============================================================================ */
+
+
+/* ----------------------------------------------------------------------------
+   1) THEME TOKENS — LIGHT MODE (DEFAULT)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Background color:           --gm-bg
+   - Main text color:            --gm-fg
+   - Secondary text:             --gm-muted
+   - Rule/divider lines:         --gm-rule
+   - Default “ink” link color:   --gm-link
+   - Hover highlight (titles):   --gm-title-hover  (blue here)
+   - Fonts:                      --gm-serif / --gm-sans
+   - Layout width + spacing:     --gm-max, --gm-hero-minh, --gm-s*
+---------------------------------------------------------------------------- */
+:root {
+  /* Paper + ink */
+  --gm-bg: #fbfbf9;                  /* off-grey paper */
+  --gm-fg: #1f2d3a;                  /* deep navy-charcoal ink */
+  --gm-muted: #3a3a3a;               /* body/secondary text */
+  --gm-rule: rgba(31, 45, 58, 0.18); /* divider/rules */
+
+  /* Links (keep “ink-like” by default; highlight only on hover) */
+  --gm-link: rgba(31, 45, 58, 0.88);
+  --gm-title-hover: #1f5ea8;         /* LIGHT MODE hover highlight: blue */
+
+  /* Typography (these fonts are loaded in _quarto.yml) */
+  --gm-serif: "Libre Caslon Text", Georgia, "Times New Roman", serif;
+  --gm-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+  /* Layout */
+  --gm-max: 1100px;                  /* max page width for the whole hero */
+  --gm-hero-minh: 78vh;              /* ensures nice vertical centering */
+
+  /* Spacing scale (used throughout) */
+  --gm-s1: 0.5rem;
+  --gm-s2: 0.9rem;
+  --gm-s3: 1.25rem;
+  --gm-s4: 2rem;
+  --gm-s5: 3.2rem;
+
+  /* Type sizes */
+  --gm-h1: clamp(2.2rem, 3.2vw, 3.6rem); /* masthead title size */
+}
+
+
+/* ----------------------------------------------------------------------------
+   2) THEME TOKENS — DARK MODE (USER TOGGLED)
+   ----------------------------------------------------------------------------
+   Trigger: html[data-theme="dark"] is set by your JS toggle.
+   Controls:
+   - Dark background and inverted text
+   - Hover highlight becomes yellow (ONLY titles)
+---------------------------------------------------------------------------- */
+html[data-theme="dark"] {
+  --gm-bg: #0f1114;                   /* dark grey */
+  --gm-fg: rgba(255, 255, 255, 0.92);
+  --gm-muted: rgba(255, 255, 255, 0.72);
+  --gm-rule: rgba(255, 255, 255, 0.16);
+
+  --gm-link: rgba(255, 255, 255, 0.86);
+  --gm-title-hover: #ffd166;          /* DARK MODE hover highlight: yellow */
+}
+
+
+/* ----------------------------------------------------------------------------
+   3) GLOBAL / QUARTO NORMALIZATION
+   ----------------------------------------------------------------------------
+   Controls:
+   - Removes leftover title/nav wrappers that can appear in Quarto themes
+   - Ensures our hero owns the page
+---------------------------------------------------------------------------- */
+body {
+  background: var(--gm-bg);
+  color: var(--gm-fg);
+
+  /* Default font for ALL regular text */
+  font-family: var(--gm-sans);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide common Quarto header/title blocks aggressively */
+.navbar,
+header.navbar,
+#quarto-header,
+.quarto-title-banner,
+.quarto-title-block {
+  display: none !important;
+}
+
+/* Remove unexpected padding constraints */
+.page-columns,
+.content,
+main,
+.quarto-container,
+#quarto-content {
+  margin: 0;
+  padding: 0;
+}
+
+main.content {
+  padding-top: 0 !important;
+}
+
+
+/* ----------------------------------------------------------------------------
+   4) PAGE WRAPPER (CENTERED “TITLE PAGE” COMPOSITION)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Overall vertical centering and margins
+   - Max width
+---------------------------------------------------------------------------- */
+.gm-hero {
+  min-height: var(--gm-hero-minh);
+  max-width: var(--gm-max);
+  margin: 0 auto;
+  padding: var(--gm-s5) var(--gm-s4);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ----------------------------------------------------------------------------
+   5) THEME TOGGLE BUTTON (TOP RIGHT)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Button size: width/height in .gm-theme-toggle
+   - Icon size: .gm-theme-icon
+   - Hover border colors for light/dark
+---------------------------------------------------------------------------- */
+.gm-topline {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--gm-s4);
+}
+
+.gm-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+
+  background: transparent;
+  border: 1px solid var(--gm-rule);
+  color: var(--gm-muted);
+
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.gm-theme-toggle:hover {
+  transform: translateY(-1px);
+  color: var(--gm-fg);
+  border-color: rgba(31, 94, 168, 0.35);
+  background: rgba(31, 45, 58, 0.03);
+}
+
+html[data-theme="dark"] .gm-theme-toggle:hover {
+  border-color: rgba(255, 209, 102, 0.45);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Inline SVG icon inherits currentColor */
+.gm-theme-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+
+/* ----------------------------------------------------------------------------
+   6) MASTHEAD (TITLE + LEDE)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Masthead column width: .gm-masthead width
+   - Title styling: .gm-title (+ .gm-government span)
+   - Lede (description paragraph): .gm-lede
+---------------------------------------------------------------------------- */
+.gm-masthead {
+  width: min(780px, 94%);
+  text-align: center;
+}
+
+.gm-title {
+  font-family: var(--gm-serif);
+  font-weight: 700;
+  font-size: var(--gm-h1);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--gm-s3) 0;
+}
+
+.gm-government {
+  /* Keep if you later want a subtle stylistic distinction */
+  font-style: normal;
+}
+
+.gm-lede {
+  font-family: var(--gm-sans);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--gm-muted);
+  margin: 0 auto var(--gm-s4) auto;
+}
+
+
+/* ----------------------------------------------------------------------------
+   7) DIVIDER RULE (HORIZONTAL LINE)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Rule width: width in .gm-rule
+   - Rule color: --gm-rule token
+---------------------------------------------------------------------------- */
+.gm-rule,
+hr.gm-rule {
+  width: min(560px, 92%);
+  border: none;
+  height: 1px;
+  background: var(--gm-rule);
+  margin: 0 0 var(--gm-s4) 0;
+}
+
+
+/* ----------------------------------------------------------------------------
+   8) JOURNAL CONTENTS LIST (CENTER COLUMN)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Column width: .gm-index width
+   - Spacing between items: gap
+   - Hover wash: .gm-item:hover background
+   - Kicker styling: .gm-item-kicker
+   - Title styling: .gm-item-title
+   - Description styling: .gm-item-desc
+   - Hover highlight color: --gm-title-hover
+---------------------------------------------------------------------------- */
+.gm-index {
+  width: min(680px, 94%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem; /* tighter = more journal/ToC */
+}
+
+.gm-item {
+  text-decoration: none;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  transition: background 140ms ease;
+}
+
+.gm-item:hover {
+  background: rgba(31, 45, 58, 0.03);
+}
+
+html[data-theme="dark"] .gm-item:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* small “section label” */
+.gm-item-kicker {
+  font-family: var(--gm-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  margin-bottom: 0.2rem;
+}
+
+/* main item title: this is the ONLY part that brightens on hover */
+.gm-item-title {
+  font-family: var(--gm-serif);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--gm-link);
+  margin-bottom: 0.28rem;
+  transition: color 140ms ease;
+}
+
+.gm-item-desc {
+  margin: 0;
+  font-family: var(--gm-sans);
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: var(--gm-muted);
+  max-width: 62ch;
+}
+
+/* Hover highlight rule requested: ONLY title changes */
+.gm-item:hover .gm-item-title {
+  color: var(--gm-title-hover);
+}
+
+
+/* ----------------------------------------------------------------------------
+   9) FOOTER (YEAR MARK)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Footer spacing: margin-top
+---------------------------------------------------------------------------- */
+.gm-footer {
+  margin-top: var(--gm-s4);
+  font-family: var(--gm-sans);
+  font-size: 0.85rem;
+  color: var(--gm-muted);
+  opacity: 0.9;
+}
+
+
+/* ----------------------------------------------------------------------------
+   10) RESPONSIVE (MOBILE)
+   ----------------------------------------------------------------------------
+   Controls:
+   - Smaller padding on phones
+   - Centers the toggle row (looks nicer on mobile)
+---------------------------------------------------------------------------- */
+@media (max-width: 560px) {
+  .gm-hero {
+    padding: var(--gm-s4) var(--gm-s3);
+    min-height: 76vh;
+  }
+
+  .gm-topline {
+    justify-content: center;
+  }
+
+  .gm-masthead,
+  .gm-index {
+    width: 100%;
+  }
+
+  .gm-item {
+    padding: 0.65rem 0.5rem;
+  }
+}
+
+/* ============================================================================
+   11) GLOBAL PAGES (About / Ask / any normal .qmd)
+   ============================================================================
+   Goal:
+   - Keep the exact same design system (colors, fonts, light/dark)
+   - Apply a clean journal/prose layout automatically to Quarto markdown pages
+   - No HTML wrappers needed in about.qmd / ask.qmd
+
+   How it works:
+   - Quarto renders page content inside main.content
+   - We style main.content to behave like a journal article page:
+       * narrow text column
+       * left aligned
+       * serif headings, sans body
+       * subtle links
+============================================================================ */
+
+/* Main text column for all non-landing pages */
+main.content {
+  max-width: min(760px, 94%);
+  margin: 0 auto;
+  padding: var(--gm-s5) var(--gm-s4);
+  text-align: left;
+
+  /* overwrite earlier “Remove unexpected padding constraints” reset */
+  /* (you set main/content padding:0 earlier; this re-adds it intentionally) */
+}
+
+/* Page titles + headings (Quarto markdown) */
+main.content h1,
+main.content h2,
+main.content h3,
+main.content h4 {
+  font-family: var(--gm-serif);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--gm-fg);
+}
+
+main.content h1 {
+  font-size: clamp(1.8rem, 2.2vw, 2.4rem);
+  line-height: 1.15;
+  margin-top: 0;
+  margin-bottom: var(--gm-s2);
+}
+
+main.content h2 {
+  font-size: 1.35rem;
+  margin-top: var(--gm-s4);
+  margin-bottom: var(--gm-s2);
+}
+
+main.content h3 {
+  font-size: 1.15rem;
+  margin-top: var(--gm-s3);
+  margin-bottom: var(--gm-s1);
+}
+
+/* Body text */
+main.content p,
+main.content li {
+  font-family: var(--gm-sans);
+  line-height: 1.65;
+  color: var(--gm-fg);
+}
+
+main.content p {
+  margin-bottom: 0.95rem;
+}
+
+/* Lists feel tighter like a journal note */
+main.content ul,
+main.content ol {
+  padding-left: 1.25rem;
+}
+
+/* Links in prose: subtle underline, brighten on hover */
+main.content a {
+  color: var(--gm-link);
+  text-decoration: underline;
+  text-decoration-color: rgba(31, 45, 58, 0.25);
+  text-underline-offset: 2px;
+}
+
+main.content a:hover {
+  color: var(--gm-title-hover);
+  text-decoration-color: currentColor;
+}
+
+/* Blockquotes: “note” look */
+main.content blockquote {
+  margin: var(--gm-s3) 0;
+  padding: 0.8rem 1rem;
+  border-left: 2px solid var(--gm-rule);
+  color: var(--gm-muted);
+}
+
+/* Horizontal rules inside pages */
+main.content hr {
+  border: none;
+  height: 1px;
+  background: var(--gm-rule);
+  margin: var(--gm-s4) 0;
+}
+
+/* ============================================================================
+   12) GLOBAL THEME TOGGLE (fixed, all pages)
+   ============================================================================
+   Used when you inject the toggle via include-before-body in _quarto.yml.
+   This avoids having to add toggle HTML to each page.
+
+   If you KEEP the landing page’s in-flow toggle, you will see two toggles.
+   Recommended: remove the landing toggle HTML, and rely on this fixed one.
+============================================================================ */
+
+.gm-theme-toggle--fixed {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 560px) {
+  main.content {
+    padding: var(--gm-s4) var(--gm-s3);
+  }
+
+  .gm-theme-toggle--fixed {
+    top: 14px;
+    right: 14px;
+  }
+}
+
+/* ============================================================================
+   GLOBAL HEADING TYPOGRAPHY
+   ----------------------------------------------------------------------------
+   All headings across the site use serif.
+   All non-heading text uses sans.
+============================================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--gm-serif);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Markdown prose (About / Ask / future pages) */
+main.content p,
+main.content li,
+main.content blockquote,
+main.content td,
+main.content th {
+  font-family: var(--gm-sans);
+}
+
+main.content p {
+  font-weight: 400;
+}
+
+.gm-lede {
+  font-weight: 400;
+}

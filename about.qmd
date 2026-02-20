@@ -1,0 +1,24 @@
+---
+title: "About"
+---
+Government Methods is a student-run initiative in the Department of Government at Georgetown University. Maintained by graduate students and supported by the Department, it gathers the tools, workflows, code, and conceptual frameworks we repeatedly return to in our research and teaching. The aim is not to create a comprehensive methods encyclopedia, but to build a shared working archive — careful, reproducible, and evolving — that strengthens how we design, implement, and communicate political science research.
+
+### Brown Bag Series Contributors
+- *Min Ha Kim* 
+- *Samirah Jaigirdar*
+- *Keeheon Lee*
+- *Alexander Rodrigous*
+- *Rong Qin*
+- *Mohammad Hashem Krayem*
+
+### Math Camp Instructors
+
+- *Mohammad Hashem Krayem*
+- *Parushya*
+
+### Editors
+- *Sara Mohammadi* 
+- *Parushya*
+
+### Contact
+- *TBD*

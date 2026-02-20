@@ -1,0 +1,95 @@
+---
+title: ""
+title-block-style: none
+toc: false
+page-layout: full
+format:
+  html:
+    css: styles.scss
+    embed-resources: true
+    include-in-header:
+      text: |
+        <script>
+          (function () {
+            const KEY = "gm_theme";
+            const root = document.documentElement;
+
+            function applyTheme(value) {
+              if (value === "dark") root.setAttribute("data-theme", "dark");
+              else root.removeAttribute("data-theme");
+
+              const label = document.getElementById("gm-theme-label");
+              if (label) label.textContent = (value === "dark") ? "Dark" : "Light";
+            }
+
+            const stored = localStorage.getItem(KEY);
+            applyTheme(stored === "dark" ? "dark" : "light");
+
+            window.addEventListener("DOMContentLoaded", function () {
+              const btn = document.getElementById("gm-theme-toggle");
+              if (!btn) return;
+
+              btn.addEventListener("click", function () {
+                const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+                const next = (current === "dark") ? "light" : "dark";
+                localStorage.setItem(KEY, next);
+                applyTheme(next);
+              });
+            });
+          })();
+        </script>
+---
+
+```{=html}
+<div class="gm-hero">
+
+  <div class="gm-masthead">
+    <div class="gm-title"><span class="gm-government">Government</span> Methods</div>
+
+    <div class="gm-lede">
+      A student-run initiative in the Department of Government at Georgetown University.
+      Maintained by graduate students and supported by the department, it collects the ideas, resources, and code we keep returning to —
+      and builds from there.
+    </div>
+  </div>
+
+  <hr class="gm-rule"/>
+
+  <div class="gm-index">
+
+    <a href="../methodsbrownbag/" class="gm-item">
+      <div class="gm-item-kicker">Workshop Series</div>
+      <div class="gm-item-title">methods.brown.bag</div>
+      <p class="gm-item-desc">Sessions on tools, workflows, and research design — with reproducible examples.</p>
+    </a>
+
+    <a href="../mathcamp2025/" class="gm-item">
+      <div class="gm-item-kicker">Training</div>
+      <div class="gm-item-title">math.camp</div>
+      <p class="gm-item-desc">Refreshers in mathematics, statistics, and computation to start the year sharp.</p>
+    </a>
+
+    <a href="./notes/" class="gm-item">
+      <div class="gm-item-kicker">Reference</div>
+      <div class="gm-item-title">notes</div>
+      <p class="gm-item-desc">Snippets, templates, and technical write-ups we reach for often.</p>
+    </a>
+
+    <a href="./about.html" class="gm-item">
+      <div class="gm-item-kicker">Project</div>
+      <div class="gm-item-title">about</div>
+      <p class="gm-item-desc">Who runs this, how it’s organized, and how to contribute.</p>
+    </a>
+
+    <a href="./ask.html" class="gm-item">
+      <div class="gm-item-kicker">Contact</div>
+      <div class="gm-item-title">ask.a.question</div>
+      <p class="gm-item-desc">Suggest a session, request a resource, or flag something to fix.</p>
+    </a>
+
+  </div>
+
+  <div class="gm-footer">2025–26</div>
+
+</div>
+```

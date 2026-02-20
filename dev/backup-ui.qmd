@@ -1,0 +1,54 @@
+---
+title: "Government Methods"
+page-layout: full
+---
+
+<div class="gm-masthead">
+  <div class="gm-title"><span class="gm-government">Government</span> Methods</div>
+
+  <div class="gm-lede">
+    Government Methods is a student-run initiative in the Department of Government at Georgetown University.
+    Maintained by graduate students and supported by the Department, it collects the ideas, code, and resources we keep returning to —
+    and builds from there.
+  </div>
+</div>
+
+<hr class="gm-rule"/>
+
+<div class="gm-index">
+
+<a href="methodsbrownbag/" class="gm-item">
+  <div class="gm-item-kicker">Workshop Series</div>
+  <div class="gm-item-title">methods.brown.bag</div>
+  <p class="gm-item-desc">Sessions on tools, workflows, and research design — with reproducible examples.</p>
+</a>
+
+<a href="mathcamp2025/" class="gm-item">
+  <div class="gm-item-kicker">Training</div>
+  <div class="gm-item-title">math.camp</div>
+  <p class="gm-item-desc">Refreshers in mathematics, statistics, and computation to start the year sharp.</p>
+</a>
+
+<a href="notes/" class="gm-item">
+  <div class="gm-item-kicker">Reference</div>
+  <div class="gm-item-title">notes</div>
+  <p class="gm-item-desc">Snippets, templates, and technical write-ups we reach for often.</p>
+</a>
+
+<a href="about.qmd" class="gm-item">
+  <div class="gm-item-kicker">Project</div>
+  <div class="gm-item-title">about</div>
+  <p class="gm-item-desc">Who runs this, how it’s organized, and how to contribute.</p>
+</a>
+
+<a href="ask.qmd" class="gm-item">
+  <div class="gm-item-kicker">Contact</div>
+  <div class="gm-item-title">ask.a.question</div>
+  <p class="gm-item-desc">Suggest a session, request a resource, or flag something to fix.</p>
+</a>
+
+</div>
+
+<div class="gm-footer">
+2025–26
+</div>

@@ -1,0 +1,16 @@
+---
+title: "Ask a question"
+---
+
+We welcome questions and suggestions that would benefit others in the department.
+
+**Helpful submissions include:**\
+
+- A clearly defined methodological question  
+- A reproducible example (preferred)  
+- A reference or paper you would like discussed  
+- A proposal for a workshop topic  
+
+Submissions may lead to a brown bag session, a short technical note, or an addition to our shared archive.
+
+- *(Later: link a Google Form, GitHub issue template, or departmental email.)*

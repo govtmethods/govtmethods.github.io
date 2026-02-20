@@ -1,0 +1,57 @@
+project:
+  type: website
+  render:
+    - "*.qmd"
+    - "!dev/**"
+
+website:
+  title: ""
+  navbar: false
+  search: false
+
+format:
+  html:
+    page-layout: full
+    theme: none
+    css: styles.scss
+    embed-resources: true
+
+    include-before-body:
+      - _includes/gm-toggle.html
+
+    header-includes: |
+      <!-- Fonts -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+      <!-- Theme toggle (global) -->
+      <script>
+        (function () {
+          const KEY = "gm_theme";
+      
+          function setTheme(value) {
+            const root = document.documentElement;
+            if (value === "dark") root.setAttribute("data-theme", "dark");
+            else root.removeAttribute("data-theme");
+          }
+      
+          function getTheme() {
+            return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+          }
+      
+          // Apply stored theme ASAP
+          const stored = localStorage.getItem(KEY);
+          setTheme(stored === "dark" ? "dark" : "light");
+      
+          // Event delegation: works regardless of where/when button appears
+          document.addEventListener("click", function (e) {
+            const btn = e.target.closest(".gm-theme-toggle");
+            if (!btn) return;
+      
+            const next = (getTheme() === "dark") ? "light" : "dark";
+            localStorage.setItem(KEY, next);
+            setTheme(next);
+          });
+        })();
+      </script>
