@@ -40,6 +40,10 @@ jobs:
           cd host
           git config user.name  "govtmethods-ci"
           git config user.email "actions@users.noreply.github.com"
+
+          # Force the correct push remote (deploy repo), authenticated with PAT
+          git remote set-url origin https://x-access-token:${{ secrets.PAGES_DEPLOY_PAT }}@github.com/govtmethods/govtmethods.github.io.git
+
           git add -A
           git diff --cached --quiet || git commit -m "Deploy landing: $GITHUB_SHA"
-          git push
+          git push origin HEAD:main
