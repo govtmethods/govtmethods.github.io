@@ -5,8 +5,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
 
 jobs:
   build-and-publish:
@@ -39,14 +37,15 @@ jobs:
           touch host/.nojekyll
 
       - name: Commit and push to host (with PAT)
+        env:
+          PAT: ${{ secrets.PAGES_DEPLOY_PAT }}
         run: |
           cd host
           git config user.name  "govtmethods-ci"
           git config user.email "actions@users.noreply.github.com"
 
-          # Force PAT-auth remote (prevents github-actions[bot] 403)
-          git remote set-url origin https://x-access-token:${{ secrets.PAGES_DEPLOY_PAT }}@github.com/govtmethods/govtmethods.github.io.git
-
           git add -A
           git diff --cached --quiet || git commit -m "Deploy landing: $GITHUB_SHA"
-          git push origin HEAD:main
+
+          # Use PAT explicitly during push
+          git push https://x-access-token:${PAT}@github.com/govtmethods/govtmethods.github.io.git HEAD:main
