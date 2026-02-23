@@ -41,9 +41,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Fail fast if secret is missing (won't print it)
           if [ -z "${PAT}" ]; then
-            echo "ERROR: PAGES_DEPLOY_PAT secret is empty or unavailable."
+            echo "ERROR: PAGES_DEPLOY_PAT secret is empty."
             exit 1
           fi
 
@@ -51,8 +50,10 @@ jobs:
           git config user.name  "govtmethods-ci"
           git config user.email "actions@users.noreply.github.com"
 
+          # Important: remove any credential helper so we don't use github-actions[bot]
+          git config --unset-all credential.helper || true
+
           git add -A
           git diff --cached --quiet || git commit -m "Deploy landing: $GITHUB_SHA"
 
-          # Push using PAT-auth URL (token will be masked in logs)
           git push "https://x-access-token:${PAT}@github.com/govtmethods/govtmethods.github.io.git" HEAD:main
