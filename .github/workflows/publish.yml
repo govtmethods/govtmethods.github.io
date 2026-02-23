@@ -11,8 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - name: Checkout host repo (deploy)
+         uses: actions/checkout@v4
+         with:
+          repository: govtmethods/govtmethods.github.io
+          path: host
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -40,6 +45,14 @@ jobs:
         env:
           PAT: ${{ secrets.PAGES_DEPLOY_PAT }}
         run: |
+          set -euo pipefail
+
+          # Fail fast if secret is missing (won't print it)
+          if [ -z "${PAT}" ]; then
+            echo "ERROR: PAGES_DEPLOY_PAT secret is empty or unavailable."
+            exit 1
+          fi
+
           cd host
           git config user.name  "govtmethods-ci"
           git config user.email "actions@users.noreply.github.com"
@@ -47,5 +60,5 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -m "Deploy landing: $GITHUB_SHA"
 
-          # Use PAT explicitly during push
-          git push https://x-access-token:${PAT}@github.com/govtmethods/govtmethods.github.io.git HEAD:main
+          # Push using PAT-auth URL (token will be masked in logs)
+          git push "https://x-access-token:${PAT}@github.com/govtmethods/govtmethods.github.io.git" HEAD:main
