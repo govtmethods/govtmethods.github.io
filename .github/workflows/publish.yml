@@ -5,19 +5,13 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout host repo (deploy)
-         uses: actions/checkout@v4
-         with:
-          repository: govtmethods/govtmethods.github.io
-          path: host
-          fetch-depth: 1
-          persist-credentials: false
+      - name: Checkout source
+        uses: actions/checkout@v4
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -32,8 +26,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: govtmethods/govtmethods.github.io
-          token: ${{ secrets.PAGES_DEPLOY_PAT }}
           path: host
+          fetch-depth: 1
           persist-credentials: false
 
       - name: Sync rendered output to host root
