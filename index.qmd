@@ -57,31 +57,31 @@ format:
 
   <div class="gm-index">
 
-    <a href="../methodsbrownbag/" class="gm-item">
+    <a href="/methodsbrownbag/" class="gm-item">
       <div class="gm-item-kicker">Workshop Series</div>
       <div class="gm-item-title">methods.brown.bag</div>
       <p class="gm-item-desc">Sessions on tools, workflows, and research design — with reproducible examples.</p>
     </a>
 
-    <a href="../mathcamp2025/" class="gm-item">
+    <a href="/mathcamp/" class="gm-item">
       <div class="gm-item-kicker">Training</div>
       <div class="gm-item-title">math.camp</div>
       <p class="gm-item-desc">Refreshers in mathematics, statistics, and computation to start the year sharp.</p>
     </a>
 
-    <a href="./notes/" class="gm-item">
+    <a href="/notes/" class="gm-item">
       <div class="gm-item-kicker">Reference</div>
       <div class="gm-item-title">notes</div>
       <p class="gm-item-desc">Snippets, templates, and technical write-ups we reach for often.</p>
     </a>
 
-    <a href="./about.html" class="gm-item">
+    <a href="/about.html" class="gm-item">
       <div class="gm-item-kicker">Project</div>
       <div class="gm-item-title">about</div>
       <p class="gm-item-desc">Who runs this, how it’s organized, and how to contribute.</p>
     </a>
 
-    <a href="./ask.html" class="gm-item">
+    <a href="/ask.html" class="gm-item">
       <div class="gm-item-kicker">Contact</div>
       <div class="gm-item-title">ask.a.question</div>
       <p class="gm-item-desc">Suggest a session, request a resource, or flag something to fix.</p>
