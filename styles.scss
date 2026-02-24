@@ -520,3 +520,11 @@ main.content p {
 .gm-lede {
   font-weight: 400;
 }
+
+/* Hide Quarto-rendered page title (keep it in <title> metadata for previews) */
+.quarto-title-block,
+#title-block-header,
+.quarto-title,
+h1.title {
+  display: none !important;
+}
