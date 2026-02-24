@@ -1,12 +1,21 @@
-name: Publish landing to govtmethods.github.io (root)
+name: Deploy site with GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,34 +31,20 @@ jobs:
       - name: Render site
         run: quarto render
 
-      # Checkout the DEPLOY repo into ./host using the PAT
-      - name: Checkout host repo
-        uses: actions/checkout@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          repository: govtmethods/govtmethods.github.io
-          token: ${{ secrets.PAGES_DEPLOY_PAT }}
-          path: host
-          fetch-depth: 0
-          persist-credentials: false
+          path: _site
 
-      - name: Sync rendered output to host root
-        run: |
-          rsync -av --delete _site/ host/
-          touch host/.nojekyll
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-      - name: Commit changes in host repo
-        run: |
-          cd host
-          git config user.name  "govtmethods-ci"
-          git config user.email "actions@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet || git commit -m "Deploy landing: $GITHUB_SHA"
+    runs-on: ubuntu-latest
+    needs: build
 
-      # Push using the action (explicit token)
-      - name: Push host repo
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.PAGES_DEPLOY_PAT }}
-          repository: govtmethods/govtmethods.github.io
-          branch: main
-          directory: host
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
