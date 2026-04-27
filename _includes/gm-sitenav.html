@@ -10,15 +10,36 @@
 <script>
   (function () {
     var p = window.location.pathname;
-    if (p === "/" || p === "/index.html" || p.endsWith("/index.html")) {
+    var isIndex = (p === "/" || p === "/index.html" || p.endsWith("/index.html"));
+
+    if (isIndex) {
+      // Hide nav on the home page — it has its own full-page navigation
       var nav = document.getElementById("gm-sitenav");
       if (nav) nav.style.display = "none";
       return;
     }
-    // Mark the current page link as active
+
+    // Mark current page link
     document.querySelectorAll(".gm-sitenav-links a").forEach(function (a) {
-      if (a.getAttribute("href") && p.endsWith(a.getAttribute("href").replace(/^\//, ""))) {
+      var href = a.getAttribute("href") || "";
+      if (href && p.endsWith(href.replace(/^\//, ""))) {
         a.setAttribute("aria-current", "page");
+      }
+    });
+
+    // Wrap page body content (everything except sitenav + fixed toggle)
+    // in a centering div, since theme:none produces no main/content wrapper.
+    document.addEventListener("DOMContentLoaded", function () {
+      var wrapper = document.createElement("div");
+      wrapper.className = "gm-article-content";
+      var toWrap = Array.from(document.body.children).filter(function (el) {
+        return el.id !== "gm-sitenav" &&
+               !el.classList.contains("gm-theme-toggle--fixed") &&
+               el.tagName !== "SCRIPT";
+      });
+      if (toWrap.length) {
+        document.body.insertBefore(wrapper, toWrap[0]);
+        toWrap.forEach(function (el) { wrapper.appendChild(el); });
       }
     });
   })();

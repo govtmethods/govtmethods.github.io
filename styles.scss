@@ -611,12 +611,17 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
   font-weight: 500;
 }
 
-/* Inner pages: centered column, consistent with landing page aesthetic */
-main.content:not(.page-full) {
+/* Inner pages: centered column injected by gm-sitenav.html JS */
+.gm-article-content {
   max-width: 720px;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding: var(--gm-s5) var(--gm-s4) !important;
+  margin: 0 auto;
+  padding: var(--gm-s5) var(--gm-s4);
+}
+
+@media (max-width: 560px) {
+  .gm-article-content {
+    padding: var(--gm-s4) var(--gm-s3);
+  }
 }
 
 @media (max-width: 560px) {
