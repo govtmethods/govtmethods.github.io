@@ -1,24 +1,102 @@
 ---
 title: "About"
+page-layout: article
+toc: false
 ---
+
 Government Methods is a student-run initiative in the Department of Government at Georgetown University. Maintained by graduate students and supported by the Department, it gathers the tools, workflows, code, and conceptual frameworks we repeatedly return to in our research and teaching. The aim is not to create a comprehensive methods encyclopedia, but to build a shared working archive — careful, reproducible, and evolving — that strengthens how we design, implement, and communicate political science research.
 
-### Brown Bag Series Contributors
-- *Min Ha Kim* 
-- *Samirah Jaigirdar*
-- *Keeheon Lee*
-- *Alexander Rodrigous*
-- *Rong Qin*
-- *Mohammad Hashem Krayem*
+---
 
-### Math Camp Instructors
+## Brown Bag Series
 
-- *Mohammad Hashem Krayem*
-- *Parushya*
+A recurring workshop series where graduate students present tools, workflows, and research design concepts — with reproducible examples in R and Quarto.
 
-### Editors
-- *Sara Mohammadi* 
-- *Parushya*
+```{=html}
+<div id="gm-bb-contributors" class="gm-contributors">
+  <!-- populated from chapters-meta.json; static fallback below if fetch fails -->
+  <noscript>
+    <ul>
+      <li>Min Ha Kim</li>
+      <li>Samirah Jaigirdar</li>
+      <li>Keeheon Lee</li>
+      <li>Alexander Rodrigous</li>
+      <li>Rong Qin</li>
+      <li>Mohammad Hashem Krayem</li>
+      <li>Parushya</li>
+    </ul>
+  </noscript>
+</div>
 
-### Contact
-- <govtmethods@georgetown.edu>
+<script>
+(function () {
+  const BB_JSON = "https://govtmethods.github.io/methodsbrownbag/chapters-meta.json";
+  const BB_BASE = "https://govtmethods.github.io/methodsbrownbag/";
+
+  fetch(BB_JSON)
+    .then(function (r) { return r.json(); })
+    .then(function (chapters) {
+      // Group chapters by author (handles comma-separated multi-author strings)
+      var map = {};
+      chapters.forEach(function (c) {
+        var authors = c.author ? c.author.split(", ") : [];
+        authors.forEach(function (a) {
+          a = a.trim();
+          if (!a) return;
+          if (!map[a]) map[a] = [];
+          map[a].push(c);
+        });
+      });
+
+      var container = document.getElementById("gm-bb-contributors");
+      if (!container || Object.keys(map).length === 0) return;
+
+      container.innerHTML = Object.keys(map).map(function (author) {
+        var sessions = map[author].map(function (c) {
+          var date = c.date ? '<span class="gm-contrib-date">' + c.date + "</span>" : "";
+          return '<li><a href="' + BB_BASE + c.href + '">' + c.title + "</a>" + date + "</li>";
+        }).join("");
+        return '<div class="gm-contributor">' +
+          '<div class="gm-contrib-name">' + author + "</div>" +
+          "<ul>" + sessions + "</ul>" +
+          "</div>";
+      }).join("");
+    })
+    .catch(function () {
+      // Fetch failed (local preview) — show static list
+      var container = document.getElementById("gm-bb-contributors");
+      if (!container) return;
+      container.innerHTML =
+        "<ul>" +
+        ["Min Ha Kim","Samirah Jaigirdar","Keeheon Lee",
+         "Alexander Rodrigous","Rong Qin","Mohammad Hashem Krayem","Parushya"]
+        .map(function (n) { return "<li>" + n + "</li>"; }).join("") +
+        "</ul>";
+    });
+})();
+</script>
+```
+
+---
+
+## Math Camp
+
+An intensive refresher in mathematics, statistics, and computation held at the start of the academic year.
+
+**Instructors**
+
+- Mohammad Hashem Krayem
+- Parushya
+
+---
+
+## Editors
+
+- Sara Mohammadi
+- Parushya
+
+---
+
+## Contact
+
+Questions, suggestions, or contributions — reach us at [govtmethods@georgetown.edu](mailto:govtmethods@georgetown.edu).

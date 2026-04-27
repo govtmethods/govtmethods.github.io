@@ -433,18 +433,21 @@ main.content ol {
   padding-left: 1.25rem;
 }
 
-/* Links in prose: subtle underline, brighten on hover */
+/* Links in prose: visible blue, underline on hover */
 main.content a {
-  color: var(--gm-link);
-  text-decoration: underline;
-  text-decoration-color: rgba(31, 45, 58, 0.25);
+  color: #1f5ea8;
+  text-decoration: none;
   text-underline-offset: 2px;
 }
 
 main.content a:hover {
-  color: var(--gm-title-hover);
+  color: #17497f;
+  text-decoration: underline;
   text-decoration-color: currentColor;
 }
+
+html[data-theme="dark"] main.content a { color: #ffd166; }
+html[data-theme="dark"] main.content a:hover { color: #ffe19a; }
 
 /* Blockquotes: “note” look */
 main.content blockquote {
@@ -460,6 +463,62 @@ main.content hr {
   height: 1px;
   background: var(--gm-rule);
   margin: var(--gm-s4) 0;
+}
+
+/* ── Contributor cards (about page) ─────────────────────────────────────── */
+.gm-contributors {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 0.75rem;
+}
+
+.gm-contributor {
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--gm-rule);
+}
+
+.gm-contrib-name {
+  font-family: var(--gm-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--gm-fg);
+  margin-bottom: 0.35rem;
+}
+
+.gm-contributor ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gm-contributor li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.15rem 0;
+  font-size: 0.88rem;
+}
+
+.gm-contributor li a {
+  color: #1f5ea8;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.gm-contributor li a:hover {
+  color: #17497f;
+  text-decoration: underline;
+}
+
+html[data-theme="dark"] .gm-contributor li a { color: #ffd166; }
+html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
+
+.gm-contrib-date {
+  font-family: var(--gm-sans);
+  font-size: 0.78rem;
+  color: var(--gm-muted);
+  white-space: nowrap;
 }
 
 /* ============================================================================
