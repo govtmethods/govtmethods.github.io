@@ -551,6 +551,87 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
 }
 
 /* ============================================================================
+   13) SITE NAVIGATION BAR (about / ask / inner pages)
+   ----------------------------------------------------------------------------
+   Injected via _includes/gm-sitenav.html on all pages.
+   Hidden on the index page via JS (pathname check).
+============================================================================ */
+
+.gm-sitenav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1.4rem;
+  border-bottom: 1px solid var(--gm-rule);
+  background: var(--gm-bg);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-sizing: border-box;
+}
+
+.gm-sitenav-home {
+  font-family: var(--gm-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gm-fg);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.gm-sitenav-home:hover {
+  color: var(--gm-title-hover);
+}
+
+.gm-sitenav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding-right: 3.2rem; /* clear the fixed theme toggle */
+}
+
+.gm-sitenav-links a {
+  font-family: var(--gm-sans);
+  font-size: 0.8rem;
+  color: var(--gm-muted);
+  text-decoration: none;
+  transition: color 120ms ease;
+  white-space: nowrap;
+}
+
+.gm-sitenav-links a:hover {
+  color: var(--gm-fg);
+}
+
+/* Current-page highlight: mark the active link */
+.gm-sitenav-links a[aria-current="page"] {
+  color: var(--gm-fg);
+  font-weight: 500;
+}
+
+/* Inner page content: add breathing room below the sticky nav */
+main.content:not(.page-full) {
+  padding-top: var(--gm-s4) !important;
+}
+
+@media (max-width: 560px) {
+  .gm-sitenav {
+    padding: 0.6rem 1rem;
+  }
+
+  .gm-sitenav-links {
+    gap: 0.9rem;
+    padding-right: 2.8rem;
+  }
+
+  .gm-sitenav-links a {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================================================
    GLOBAL HEADING TYPOGRAPHY
    ----------------------------------------------------------------------------
    All headings across the site use serif.

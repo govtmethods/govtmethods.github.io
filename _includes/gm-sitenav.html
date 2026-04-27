@@ -1,0 +1,25 @@
+<nav class="gm-sitenav" id="gm-sitenav" aria-label="Site navigation">
+  <a href="/" class="gm-sitenav-home">Government Methods</a>
+  <div class="gm-sitenav-links">
+    <a href="/methodsbrownbag/">Brown Bag</a>
+    <a href="/mathcamp/">Math Camp</a>
+    <a href="/about.html">About</a>
+    <a href="/ask.html">Ask</a>
+  </div>
+</nav>
+<script>
+  (function () {
+    var p = window.location.pathname;
+    if (p === "/" || p === "/index.html" || p.endsWith("/index.html")) {
+      var nav = document.getElementById("gm-sitenav");
+      if (nav) nav.style.display = "none";
+      return;
+    }
+    // Mark the current page link as active
+    document.querySelectorAll(".gm-sitenav-links a").forEach(function (a) {
+      if (a.getAttribute("href") && p.endsWith(a.getAttribute("href").replace(/^\//, ""))) {
+        a.setAttribute("aria-current", "page");
+      }
+    });
+  })();
+</script>

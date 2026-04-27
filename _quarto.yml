@@ -17,6 +17,7 @@ format:
     embed-resources: true
 
     include-before-body:
+      - _includes/gm-sitenav.html
       - _includes/gm-toggle.html
 
     header-includes: |

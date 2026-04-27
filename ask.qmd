@@ -1,5 +1,7 @@
 ---
 title: "Ask a question"
+page-layout: article
+toc: false
 ---
 
 We welcome questions and suggestions that would benefit others in the department.
