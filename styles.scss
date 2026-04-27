@@ -611,9 +611,12 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
   font-weight: 500;
 }
 
-/* Inner page content: add breathing room below the sticky nav */
+/* Inner pages: centered column, consistent with landing page aesthetic */
 main.content:not(.page-full) {
-  padding-top: var(--gm-s4) !important;
+  max-width: 720px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: var(--gm-s5) var(--gm-s4) !important;
 }
 
 @media (max-width: 560px) {
