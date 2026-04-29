@@ -51,7 +51,7 @@ A recurring workshop series where graduate students present tools, workflows, an
       var container = document.getElementById("gm-bb-contributors");
       if (!container || Object.keys(map).length === 0) return;
 
-      container.innerHTML = Object.keys(map).map(function (author) {
+      container.innerHTML = Object.keys(map).sort().map(function (author) {
         var sessions = map[author].map(function (c) {
           var date = c.date ? '<span class="gm-contrib-date">' + c.date + "</span>" : "";
           return '<li><a href="' + BB_BASE + c.href + '">' + c.title + "</a>" + date + "</li>";
