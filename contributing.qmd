@@ -1,0 +1,923 @@
+---
+title: "Contributor Guide"
+subtitle: "Setup, writing, and deployment for Government Methods"
+page-layout: article
+toc: false
+date-modified: 2026-08-29
+---
+
+# Contributor Guide
+
+This guide takes a new collaborator — someone who may have never used Git professionally, set up SSH, or worked in a multi-repo publishing system — from zero to confidently contributing content that deploys automatically to the web.
+
+**What you need before starting**
+
+- A computer running macOS, Windows, or Linux. Where steps differ by platform, all three are given.
+- A GitHub account. If you do not have one, create it at [github.com](https://github.com) first.
+- No coding experience. You will write in `.qmd` files, which are plain text with light formatting marks.^[`.qmd` stands for "Quarto Markdown." Markdown formats text using plain characters — `**bold**` becomes **bold**, `# Heading` becomes a heading. Quarto adds the ability to run R or Python code inside the document and render it to HTML or PDF.]
+
+**How to read this guide**
+
+- When this guide says **run** a command, it means: open a terminal and paste the command exactly.
+  - **macOS** — press `Cmd + Space`, type "Terminal", press Enter. The default shell is zsh.
+  - **Windows** — use **Git Bash** (installed with Git for Windows, see below). Every command in this guide is written for a Unix-style shell; Git Bash provides one. PowerShell and CMD will not work for most of these.
+  - **Linux** — any terminal.
+- Lines beginning with `#` inside a command block are comments. They explain the next line and do nothing when run.
+- A `$` at the start of a command in other documentation just means "this is a terminal command." Do not type it.
+
+## Contents
+
+- [The contributor rule](#the-contributor-rule)
+- [How the system works](#how-the-system-works)
+- [One-time setup](#one-time-setup)
+- [When `renv::restore()` fails](#when-renvrestore-fails)
+- [Day-to-day workflow](#day-to-day-workflow)
+- [Adding a new chapter](#adding-a-new-chapter)
+- [Working with R packages](#working-with-r-packages)
+- [Deployment](#deployment)
+- [Troubleshooting](#troubleshooting)
+- [Quick reference](#quick-reference)
+- [Maintainer notes](#maintainer-notes)
+- [Who to contact](#who-to-contact)
+
+---
+
+## The contributor rule
+
+**As a collaborator, you touch exactly two things:**
+
+1. Your own `.qmd` file (a chapter, or a page).
+2. The `chapters:` list in `_quarto.yml`, to register that file.
+
+Everything else — the theme, the shared HTML components, the Lua filters, the CI workflows — is maintained separately and deliberately kept out of your way. You never need to read or edit CSS, HTML, or JavaScript to contribute a session.
+
+If you find yourself about to edit `styles.scss`, `_includes/`, `_filters/`, or `.github/workflows/`, stop and talk to a maintainer instead. It is not that you are forbidden; it is that those files are shared across three sites and a well-meaning change in one place breaks the other two.
+
+---
+
+## How the system works
+
+### What Git is, briefly
+
+**Git** is a version control system — it tracks changes to files over time and lets several people work on the same project without overwriting each other.^[Think of Git as a very detailed "track changes," except instead of inline markup it records snapshots of the whole project at each save point (a **commit**). Every commit carries a message and an author, and you can return to any earlier snapshot.]
+
+**GitHub** hosts Git repositories online, adds collaboration features (Pull Requests, Issues, Actions), and in our case runs the pipeline that publishes the public website.
+
+### The three repositories
+
+There are three repositories, all owned by the `govtmethods` account. Each one is a source repo **and** publishes its own website. There is no separate "deploy repo," and no output is ever copied between repositories.
+
+| Repository | What it holds | Public URL |
+|---|---|---|
+| `govtmethods.github.io` | Landing page, About, Ask, Notes | `https://govtmethods.github.io/` |
+| `methodsbrownbag` | Methods Brown Bag book | `.../methodsbrownbag/` |
+| `mathcamp` | Math Camp book | `.../mathcamp/` |
+
+The URLs line up neatly because of a GitHub Pages convention: a repository named `<org>.github.io` is served at the root of the domain, and every other repository in the org is served from a subpath named after it. That is the only reason the landing repo has a special name — it is not doing anything else special.
+
+### What happens when you push
+
+When a Pull Request is merged into `main` in any of the three repos:
+
+1. **GitHub Actions** detects the merge and starts a build.^[GitHub Actions is GitHub's built-in CI/CD system. It runs jobs on GitHub's servers in response to events like pushes and merges — effectively a robot that builds and publishes your changes.]
+2. The build machine installs Quarto, R 4.5.2, and every R package pinned in `renv.lock`. For the two books it also installs a full LaTeX distribution.
+3. It runs `quarto render`, compiling every `.qmd` into HTML — and, for the books, into a combined PDF.
+4. It uploads the rendered folder (`_site/` or `_book/`) as a Pages artifact and deploys it.
+5. GitHub Pages serves the new output. The live site updates.
+
+**You never render for deployment yourself.** Your job ends at `git push`. There is no token to configure, no deploy repo to sync, and nothing for you to publish by hand.
+
+---
+
+## One-time setup
+
+Do these once per machine. Budget 30–45 minutes the first time, most of it waiting for installers and R packages.
+
+### Step 0 — Accept the collaborator invitation
+
+A maintainer will send you a collaborator invitation from the `govtmethods` account to your personal GitHub account. You need one invitation per repository you will work in. Accept it before anything else — check your GitHub notifications or the email GitHub sends to your registered address, and click **Accept invitation**.
+
+If you skip this, pushes fail with:
+
+```
+remote: Repository not found.
+fatal: Could not read from remote repository.
+```
+
+or
+
+```
+ERROR: Permission to govtmethods/methodsbrownbag.git denied to yourusername.
+```
+
+Both mean the same thing: GitHub does not yet recognize your account as having write access.
+
+### Step 1 — Install the tools
+
+**Git**
+
+Check first:
+
+```bash
+git --version
+```
+
+A success looks like `git version 2.45.0`. If you get "command not found":
+
+- **macOS** — `xcode-select --install` installs the Command Line Tools, which include Git. (You want these anyway; several R packages need them to compile.) Alternatively `brew install git` if you use [Homebrew](https://brew.sh).
+- **Windows** — download **Git for Windows** from [git-scm.com](https://git-scm.com/download/win). This also installs **Git Bash**, which is the terminal you should use for every command in this guide. During installation, accept the defaults.
+- **Linux** — `sudo apt install git` (Debian/Ubuntu) or your distribution's equivalent.
+
+**Quarto**
+
+```bash
+quarto --version
+```
+
+If missing, download the installer for your platform from [quarto.org/docs/get-started](https://quarto.org/docs/get-started/). On macOS, `brew install --cask quarto` also works. We currently build against Quarto 1.8.x.
+
+**R**
+
+R is required for the two book projects, which contain R code chunks.^[The landing site does not execute R, so if you only ever edit About/Ask/Notes pages you can skip R entirely.]
+
+```bash
+R --version
+```
+
+The projects pin **R 4.5.2**. Install that version — download from [cran.r-project.org](https://cran.r-project.org). A different minor version usually works, but if your local render disagrees with CI, a version mismatch is the first thing to check.
+
+**LaTeX — only if you want to build PDFs locally**
+
+The books produce a PDF as well as HTML. CI installs its own LaTeX, so you do **not** need this to contribute. But `quarto render` on a book project will fail at the PDF stage without it. The easiest fix:
+
+```bash
+quarto install tinytex
+```
+
+This installs a lightweight, self-contained TeX distribution that Quarto manages for you. If you would rather not install LaTeX at all, render only the HTML while you work:
+
+```bash
+quarto render --to html
+```
+
+and let CI produce the PDF. Just be aware you are not testing the PDF path.
+
+**RStudio (optional)**
+
+RStudio is an editor tailored to R and Quarto, with a built-in preview panel many contributors like. Not required — VS Code, Cursor, or any text editor opens `.qmd` files fine.
+
+### Step 2 — Set up SSH
+
+**Why SSH.** SSH is how your laptop proves its identity to GitHub when you push.^[The alternative is HTTPS with a Personal Access Token. We prefer SSH because it needs no password at each push, does not silently expire the way tokens do, and is not subject to the restriction that blocks HTTPS tokens from modifying workflow files.] It uses a **key pair**: a private key that stays on your laptop and is never shared, and a public key you upload to GitHub. When you push, your laptop signs the request with the private key and GitHub verifies it with the public one.
+
+**There is no separate "govtmethods SSH key."** This trips up nearly everyone. GitHub authenticates you as *yourself*; what grants write access to `govtmethods` repos is the collaborator invitation from Step 0:
+
+```
+Your SSH private key
+      |  proves identity to GitHub
+Your personal GitHub account (github.com/yourname)
+      |  holds collaborator access via the invitation
+govtmethods/methodsbrownbag  ->  push allowed
+```
+
+So the public key goes on **your personal account**, never on `govtmethods`.
+
+**2A — Check for an existing key**
+
+```bash
+ls -al ~/.ssh
+```
+
+Look for a pair: `id_ed25519` (private — never share) and `id_ed25519.pub` (public — safe to share). If both exist, skip to 2D. You may instead see `id_rsa`/`id_rsa.pub`, an older type that still works; you can use it or generate a fresh Ed25519 key alongside it.^[Multiple key pairs are fine. `~/.ssh/config` tells SSH which key to use for which host — see 2F.]
+
+**2B — Generate a key**
+
+```bash
+ssh-keygen -t ed25519 -C "your.github.email@example.com"
+```
+
+The `-C` comment labels the key; use your GitHub email so you can identify it later. You will be prompted twice:
+
+- *"Enter file in which to save the key"* — press **Enter** for the default (`~/.ssh/id_ed25519`).
+- *"Enter passphrase"* — a passphrase encrypts the private key file, so someone with access to your laptop still cannot use it. Set one. You will not retype it at every push; the agent handles that.
+
+**2C — Load the key into the SSH agent**
+
+The **SSH agent** holds your decrypted key in memory so you are not prompted constantly.
+
+*macOS* — the passphrase can live in the system Keychain:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
+To make it survive reboots, create or edit `~/.ssh/config`:
+
+```
+Host github.com
+    HostName github.com
+    User git
+    AddKeysToAgent yes
+    UseKeychain yes
+    IdentityFile ~/.ssh/id_ed25519
+```
+
+*Windows* — in Git Bash:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+That lasts for the session. To have Windows load it automatically, open **Services**, find **OpenSSH Authentication Agent**, set Startup type to **Automatic**, and start it. Then `ssh-add ~/.ssh/id_ed25519` once, from PowerShell, registers the key persistently. Use the same `~/.ssh/config` block as macOS but **omit the `UseKeychain` line** — it is macOS-only and will cause an error.
+
+*Linux*:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+Add `ssh-add ~/.ssh/id_ed25519` to `~/.bashrc` or `~/.zshrc` to persist.
+
+**2D — Add the public key to GitHub**
+
+Copy it to your clipboard:
+
+```bash
+# macOS
+pbcopy < ~/.ssh/id_ed25519.pub
+
+# Windows (Git Bash)
+clip < ~/.ssh/id_ed25519.pub
+
+# Linux — prints to terminal, copy manually
+cat ~/.ssh/id_ed25519.pub
+```
+
+Then on **your personal GitHub account**: profile photo (top right) → **Settings** → **SSH and GPG keys** → **New SSH key**. Give it a title naming the machine (`MacBook Pro 2024`, `Windows desktop`), paste into the **Key** field, and click **Add SSH key**. GitHub emails a confirmation.
+
+**2E — Test the connection**
+
+```bash
+ssh -T git@github.com
+```
+
+Success looks like:
+
+```
+Hi yourusername! You've successfully authenticated,
+but GitHub does not provide shell access.
+```
+
+It shows **your** username, not `govtmethods` — that is correct, you are authenticating as yourself. "No shell access" is also expected; GitHub SSH is only for Git operations.
+
+If you see `Permission denied (publickey)`, the key is either not loaded or not on GitHub. Redo 2C, then retry.
+
+**2F — Two GitHub accounts on one machine**
+
+Common for researchers with a personal and a university account. If they use different keys, tell SSH which is which in `~/.ssh/config`:
+
+```
+# Personal account — used for govtmethods repos
+Host github.com
+    HostName github.com
+    User git
+    AddKeysToAgent yes
+    UseKeychain yes
+    IdentityFile ~/.ssh/id_ed25519
+
+# University/lab account — separate key
+Host github-university
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_university
+```
+
+(Drop `UseKeychain` on Windows and Linux.) Now `git@github.com:govtmethods/methodsbrownbag.git` uses your personal key automatically, and university repos use the alias: `git@github-university:lab-org/repo.git`.^[Update an existing repo with `git remote set-url origin git@github-university:lab-org/repo.git`.]
+
+Test each:
+
+```bash
+ssh -T git@github.com           # Hi personal-username!
+ssh -T git@github-university    # Hi university-username!
+```
+
+With one account, you need no config file at all.
+
+### Step 3 — Create a workspace folder
+
+An ordinary folder holding the repos side by side. It is **not** itself a Git repo.
+
+```bash
+mkdir -p ~/Documents/GitHub/govtmethods-workspace
+```
+
+After cloning it will contain:
+
+```
+govtmethods-workspace/
+├── govtmethods.github.io/    <- landing site source
+├── methodsbrownbag/          <- Brown Bag source
+└── mathcamp/                 <- Math Camp source
+```
+
+### Step 4 — Clone the repos
+
+```bash
+cd ~/Documents/GitHub/govtmethods-workspace
+
+git clone git@github.com:govtmethods/govtmethods.github.io.git
+git clone git@github.com:govtmethods/mathcamp.git
+git clone git@github.com:govtmethods/methodsbrownbag.git
+```
+
+`git clone` downloads the full history and registers `origin` as the name for the GitHub copy. Clone only the repos you will actually work in; you can always add the others later.
+
+### Step 5 — Restore R packages
+
+For each **book** project, open a terminal in that project's folder and run:
+
+```bash
+Rscript -e "renv::restore()"
+```
+
+This installs the exact package versions recorded in `renv.lock` so your environment matches CI. Expect this to take a while — `methodsbrownbag` pins around 130 packages, and some compile from source.
+
+**This is the step most likely to fail on a fresh machine.** If it does, see the next section before doing anything else.
+
+### Step 6 — Verify that pushing works
+
+Pick one repo and make a harmless test:
+
+```bash
+cd ~/Documents/GitHub/govtmethods-workspace/methodsbrownbag
+
+git status         # expect: "On branch main, nothing to commit"
+git pull           # sync anything new
+
+git checkout -b test/ssh-works
+git commit --allow-empty -m "Test: verify SSH push works"
+git push -u origin HEAD
+```
+
+If the push succeeds, your setup is complete. Delete the test branch on GitHub (repo → Branches → delete `test/ssh-works`), and locally:
+
+```bash
+git checkout main
+git branch -D test/ssh-works
+```
+
+If you see `Permission denied (publickey)`, your key is not loaded — redo Step 2C and retry.
+
+---
+
+## When `renv::restore()` fails
+
+Almost every first-time setup problem happens here, because a handful of R packages compile from C/C++ source and need system libraries that a fresh machine does not have. The error messages point at R packages but the missing piece is almost always a system dependency.
+
+**The usual suspects.** If the failure names `ragg`, `systemfonts`, `textshaping`, `curl`, `xml2`, `openssl`, or `sf`, it is a system library problem, not an R problem.
+
+**macOS**
+
+Install the Command Line Tools first — most compile failures on a new Mac trace back to their absence:
+
+```bash
+xcode-select --install
+```
+
+Then, with [Homebrew](https://brew.sh):
+
+```bash
+brew install harfbuzz fribidi freetype libpng libtiff jpeg-turbo webp libgit2
+```
+
+Re-run `renv::restore()`. If a single package still refuses to build, install the binary instead of compiling:
+
+```r
+renv::install("ragg", type = "binary")
+```
+
+**Windows**
+
+You need **Rtools**, matched to your R version — Rtools45 for R 4.5.x. Download from [cran.r-project.org/bin/windows/Rtools](https://cran.r-project.org/bin/windows/Rtools/) and install with defaults. Without Rtools, any package needing compilation fails.
+
+Windows generally has an easier time here than macOS, because CRAN ships pre-built Windows binaries for nearly everything. If `renv` is trying to compile from source anyway, force binaries:
+
+```r
+options(pkgType = "binary")
+renv::restore()
+```
+
+**Linux (Debian/Ubuntu)**
+
+The same list CI installs:
+
+```bash
+sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev \
+  libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev \
+  libpng-dev libtiff5-dev libjpeg-dev libwebp-dev libuv1-dev
+```
+
+**If it still fails.** Send a maintainer the last 30 lines of output, not just the final error — the actual cause is usually a `configure` message well above the last line. And do not hand-install packages outside `renv` to work around it: that produces an environment that differs from CI, which turns a setup problem into a mysterious build failure later.
+
+---
+
+## Day-to-day workflow
+
+There are two routes onto the live site, and **the direct one is the normal choice here**. Pushing to `main` triggers a build; the site updates in roughly 2–5 minutes. With a small team that keeps the loop short, and it is what most changes should use.
+
+Pull requests stay available, and are worth the extra steps for anything larger or less certain — see [when to use a pull request](#when-to-use-a-pull-request) below.
+
+### The normal loop — edit, render, push
+
+**1. Sync `main` before starting.**
+
+```bash
+git checkout main
+git pull
+```
+
+Skipping this is how you end up in a merge conflict — two people editing the same lines, with Git unable to choose.^[If you do hit one, Git marks the competing versions inside the file with `<<<<<<<` and `>>>>>>>`. Edit the file to the version you want, delete the markers, then `git add` it and commit. Ask for help rather than guessing if the conflict is in `_quarto.yml`.]
+
+**2. Write.** See [Adding a new chapter](#adding-a-new-chapter) for the full procedure.
+
+Files you may edit: your own `chapters/NN-name.qmd`, and `_quarto.yml` **only** to add your chapter to the `chapters:` list.
+
+Files to leave alone: `styles.scss`, `_includes/`, `_filters/`, `.github/workflows/`, and every other setting in `_quarto.yml`.
+
+**3. Preview as you write.**
+
+```bash
+quarto preview
+```
+
+This starts a local server with live reload; saving a `.qmd` updates the browser.
+
+> **A quirk of preview.** `quarto preview` does not run the post-render hook, so during preview your chapter's sidebar author label and its card on the book's index page will be missing. That is a local display gap only — it says nothing about the published site, where CI regenerates that data on every build. For checking prose and code output, preview is fine.
+
+**4. Render once before pushing — to check your own work.**
+
+```bash
+quarto render
+```
+
+**You never render for deployment.** GitHub Actions renders everything on the server and publishes the result; that is the whole point of the setup, and nothing you build locally is ever uploaded. Your local `_book/` and `_site/` folders are gitignored and go nowhere.
+
+The reason to render anyway is narrower: with direct push there is nothing between you and the live site, so this is your chance to find a broken chapter in thirty seconds rather than three minutes later in a build log. If you would rather skip it, that is a legitimate choice — push, then watch the Actions tab.
+
+If you have not installed LaTeX, `quarto render --to html` checks the HTML without attempting the PDF.
+
+**5. Check what changed, then stage deliberately.**
+
+```bash
+git status
+git add chapters/03-regression-discontinuity.qmd
+git add _quarto.yml    # only if you added your chapter to the list
+```
+
+Avoid `git add -A` and `git add .`.^[These stage everything, including `.DS_Store`, stray build output, and files you edited by accident. Staging by explicit path takes five extra seconds and prevents a whole class of confusing pull requests.]
+
+**Never commit build output.** These are generated and should already be gitignored:
+
+| Path | What it is |
+|---|---|
+| `_site/`, `_book/` | Rendered output |
+| `.quarto/`, `_freeze/` | Quarto caches |
+| `*_files/` | Generated figures and dependencies |
+| `.Rproj.user/` | RStudio session state |
+| `*.html.md`, `*.pdf.md`, `*.tex` | Intermediate Pandoc/LaTeX files |
+| `.DS_Store` | macOS folder metadata |
+
+If `git status` lists any of these as untracked or modified, stop — something is off with `.gitignore`. Tell a maintainer rather than committing them.
+
+**6. Commit with a message that says what changed.**
+
+```bash
+git commit -m "Add session: regression discontinuity design"
+```
+
+Bad: `update`. Good: `Add session: regression discontinuity design`.
+
+**7. Push.**
+
+```bash
+git push
+```
+
+That is it. The build starts immediately and the site updates in roughly 2–5 minutes.
+
+**What this route gives up.** There is no review and no pre-merge check. If your chapter fails to compile, the deploy simply does not happen — the previous version of the site keeps serving, so nothing breaks publicly, but **your change silently is not live**. GitHub emails you when a build fails; that email is your safety net, so do not let it go to a folder you never read. If you are unsure whether something published, look at `github.com/govtmethods/<repo>/actions` — a green tick means it deployed.
+
+### When to use a pull request instead {#when-to-use-a-pull-request}
+
+Direct push is fine for most work. Use a branch and a pull request when:
+
+- someone new is contributing their first chapter;
+- the change touches `_quarto.yml`, or anything shared across chapters;
+- you want a second pair of eyes before it is public;
+- you are simply not sure.
+
+The flow is the same as above, with a branch at the start and a merge at the end:
+
+```bash
+git checkout main && git pull
+git checkout -b content/regression-discontinuity
+# write, preview, render, commit as in steps 2-6
+git push -u origin HEAD
+```
+
+| Prefix | Use for |
+|---|---|
+| `content/` | Writing or updating a chapter |
+| `fix/` | Correcting a broken link, typo, or error |
+| `feature/` | Adding a new structural element |
+| `chore/` | Housekeeping — renaming files, updating dates |
+
+Then open the pull request on GitHub — it usually offers a "compare and open a pull request" banner. Give it a clear title, say what you added and what you would like looked at, and assign a maintainer as reviewer. Make any requested edits locally and push; the pull request updates itself. Merging triggers the same build as a direct push.
+
+One practical limit worth knowing: GitHub does not let you approve your own pull request, so a review needs a second person with access to the repository.
+
+---
+
+## Adding a new chapter
+
+The most common contributor task.
+
+### Step 1 — Name the file
+
+Chapters live **directly** in `chapters/`, never in a subdirectory:
+
+```
+chapters/
+├── 01-intro.qmd
+├── 02-github.qmd
+└── 03-network-analysis.qmd
+```
+
+**Numbering follows session date, not arrival date.** `NN` places the chapter in chronological order among the existing sessions — so a session held in November slots in *before* one held in February, even if you write it up later. Check the dates of the existing chapters in `_quarto.yml` before choosing your number.
+
+If your session belongs in the middle, say so in your PR rather than renumbering the existing files yourself; renumbering touches other people's chapters and is better done deliberately.
+
+### Step 2 — Write the YAML front matter
+
+Every chapter must begin with:
+
+```yaml
+---
+title: "Regression Discontinuity Design"
+author: "Your Full Name"
+date: April 15, 2026
+---
+```
+
+**These three fields are not optional.** They drive four separate features:
+
+| Feature | Where it appears | Powered by |
+|---|---|---|
+| Sidebar author label | Under the chapter link in the left nav (HTML) | JS reading `chapters-meta.json` |
+| Index session card | Session listing on the book's home page (HTML) | JS reading `chapters-meta.json` |
+| PDF chapter listing | Table of chapters in the book PDF | R code in `index.qmd` |
+| PDF chapter byline | Author and date under the chapter heading (PDF) | Lua filter |
+
+Omit one and you get silent gaps — the chapter appears, but with no attribution.
+
+**Date format: `Month DD, YYYY`** — for example `October 03, 2025`. Use the **session date**, not today's. The date string is printed verbatim into the session cards and the PDF byline, so a chapter dated `2026-04-15` will sit in a list of chapters reading `October 03, 2025` and look broken. Match the existing chapters.
+
+**Multiple authors.** Either form works:
+
+```yaml
+author: "First Author, Second Author"
+```
+
+```yaml
+author:
+  - "First Author"
+  - "Second Author"
+```
+
+If you use the single-string form, the separator must be **exactly a comma followed by a space**. The About page splits author strings on `", "` to build its contributor list, so `"First,Second"` or `"First and Second"` produces one garbled entry instead of two people, and neither author gets credited properly.
+
+### Step 3 — Put assets in a named subdirectory
+
+Images, data files, and slides go in a subdirectory named after your chapter:
+
+```
+chapters/
+├── 05-text-as-data.qmd
+└── TextAsData/
+    ├── Images/corpus-plot.png
+    └── data/sample.csv
+```
+
+**Reference them relative to `chapters/`, not to the project root:**
+
+```markdown
+![Corpus overview](TextAsData/Images/corpus-plot.png)
+```
+
+```r
+df <- read.csv("TextAsData/data/sample.csv")
+```
+
+Not `chapters/TextAsData/...`. This catches everyone once. The reason: during a book render, knitr's working directory is `chapters/`, not the project root — so a path starting with `chapters/` resolves to `chapters/chapters/` and the file is not found. The symptom is a missing image in the output or a "cannot open file" error from R.
+
+### Step 4 — If your chapter has citations
+
+Chapter-level `bibliography:` works in HTML and **silently fails in PDF**. The reason is structural: for HTML each chapter is compiled independently, but the PDF merges every chapter and compiles once from the project root, where a chapter-local bibliography path no longer resolves.
+
+So bibliography settings go at the **top level** of `_quarto.yml` — not under `book:`:
+
+```yaml
+bibliography:
+  - chapters/references.bib
+  - chapters/YourFolder/yourrefs.bib
+csl: chapters/YourFolder/style.csl
+```
+
+`csl:` and `nocite:` are likewise top-level only; they are not valid under `book:`. Add your `.bib` file to that list rather than declaring `bibliography:` inside your chapter, and mention it in your PR so a maintainer can check the merge.
+
+### Step 5 — If your session used a notebook
+
+If you presented from a Jupyter or Colab notebook, integrate the cells directly into your `.qmd` as non-executable fenced blocks:
+
+````markdown
+```python
+import pandas as pd
+df = pd.read_csv("YourFolder/data.csv")
+```
+````
+
+Keep the `.ipynb` in your chapter's asset folder for reference, but do not link to it as the primary content — a link leaves the reader outside the book, and the notebook will not appear in the PDF at all.
+
+### Step 6 — Write the content
+
+After the YAML block, write in Quarto Markdown:
+
+````markdown
+## Introduction
+
+Regression discontinuity designs exploit a threshold rule...
+
+## The basic setup
+
+Let $Y_i$ be the outcome for unit $i$, and $X_i$ the running variable...
+
+```{{r}}
+library(tidyverse)
+df |> ggplot(aes(x = score, y = outcome)) + geom_point()
+```
+````
+
+Math uses standard LaTeX: `$inline$` and `$$display$$`. Code blocks are fenced with a language label. Start your headings at `##` — `#` is reserved for the chapter title, which comes from the YAML.
+
+### Step 7 — Register the chapter
+
+Open `_quarto.yml`, find the `chapters:` list under `book:`, and add your file **in the correct chronological position**:
+
+```yaml
+book:
+  chapters:
+    - index.qmd
+    - chapters/01-intro.qmd
+    - chapters/02-github.qmd
+    - chapters/03-network-analysis.qmd   # add yours in date order
+```
+
+The order of this list is the order of the sidebar and of the PDF. **This is the only change you should make to this file.**
+
+### Step 8 — Full render, then commit
+
+```bash
+quarto render
+```
+
+This regenerates `chapters-meta.json` **in your local copy**, so you can see your name in the sidebar and your session on the index page before anyone else does. It is not needed for the published site: that file is written into `_book/`, which is gitignored, and CI regenerates it on every deploy. Your author label and session card will appear whether or not you render locally.
+
+Then commit your chapter, your asset files, and `_quarto.yml`:
+
+```bash
+git add chapters/03-network-analysis.qmd
+git add chapters/YourFolder
+git add _quarto.yml
+git commit -m "Add session: network analysis"
+git push -u origin HEAD
+```
+
+---
+
+## Working with R packages
+
+### The problem `renv` solves
+
+If your chapter uses `ggplot2` version 3.5 and the build machine has 3.4, your figures may render differently or the build may fail outright. `renv` pins the exact version of every package so your machine and CI agree.
+
+### What this means for you
+
+- After cloning, run `renv::restore()` once per book project.
+- While working, `library(whatever)` behaves normally — `renv` is transparent in daily use.
+- The library lives inside the project, not system-wide. Installing a package here cannot break your other R work.
+
+### Adding a package your chapter needs
+
+```r
+renv::install("ggraph")
+renv::snapshot()
+```
+
+`snapshot()` records the new package and its version into `renv.lock`. **Commit the updated `renv.lock` along with your chapter** — otherwise CI will not install the package and your chapter will fail to build on the server while working perfectly on your laptop.
+
+```bash
+git add renv.lock
+```
+
+Check the state of things any time with `renv::status()`.
+
+Adding a package makes the next CI build slower, since it has to install from scratch. That is expected and fine — but it is worth asking whether a heavy dependency is really needed for one figure.
+
+---
+
+## Deployment
+
+### There is no token to manage
+
+Deployment uses GitHub's built-in Pages mechanism. Each repository's workflow renders the project, uploads the result as a Pages artifact, and deploys it — all authenticated automatically by the temporary token GitHub Actions provides to every run. There is no Personal Access Token, no secret to rotate, and nothing for a contributor to configure.
+
+### Where your content ends up
+
+| Repository | Renders | Published at |
+|---|---|---|
+| `govtmethods.github.io` | `_site/` | `https://govtmethods.github.io/` |
+| `methodsbrownbag` | `_book/` | `.../methodsbrownbag/` |
+| `mathcamp` | `_book/` | `.../mathcamp/` |
+
+### How long it takes
+
+| Situation | Expected |
+|---|---|
+| First build, or after `renv.lock` changed | 5–10 minutes — packages build from source |
+| Later builds with the same `renv.lock` | 1–3 minutes — packages come from cache |
+
+Watch the live log at `github.com/govtmethods/<repo>/actions`. A build that is still running is not a build that has failed; the books legitimately take several minutes because of the LaTeX step.
+
+---
+
+## Troubleshooting
+
+**"Repository not found" or "Permission denied"**
+
+Three possible causes, in order of likelihood:
+
+1. You have not accepted the collaborator invitation (Step 0).
+2. Your SSH key is not loaded. Check with `ssh -T git@github.com`; reload with `ssh-add ~/.ssh/id_ed25519`.
+3. The repo's remote is set to HTTPS rather than SSH. Check and fix:
+
+```bash
+git remote -v
+# want: git@github.com:govtmethods/...
+# not:  https://github.com/govtmethods/...
+
+git remote set-url origin git@github.com:govtmethods/REPONAME.git
+```
+
+**SSH agent forgets the key after a reboot**
+
+On macOS, add the `~/.ssh/config` block from Step 2C with `UseKeychain yes`. On Windows, set the OpenSSH Authentication Agent service to start automatically. On Linux, add `ssh-add` to your shell profile.
+
+**`quarto render` fails at the PDF stage**
+
+If the error mentions `pdflatex`, `lualatex`, or a missing `.sty` file, you have no LaTeX installed. Either run `quarto install tinytex`, or render HTML only with `quarto render --to html` and let CI build the PDF.
+
+**Sidebar author label or index card is missing**
+
+You ran `quarto preview` rather than `quarto render`. The metadata hook only runs on a full render. If a full render still does not show it, check that your chapter's YAML has `title`, `author`, and `date`, and that the file is listed in `_quarto.yml`.
+
+**Your chapter renders locally but fails in CI**
+
+Usually one of three things:
+
+1. **A package you installed but did not snapshot.** Run `renv::snapshot()` and commit `renv.lock`.
+2. **A file that exists only on your machine** — data loaded from an absolute path like `/Users/you/Desktop/data.csv`, or an asset you forgot to `git add`. Everything your chapter needs must be committed and referenced relative to `chapters/`.
+3. **An R version difference.** CI uses R 4.5.2; check yours with `R --version`.
+
+**CI fails with a 403 or "write access not granted"**
+
+This is a repository settings problem, not something you did. The repo's **Settings → Pages → Source** must be set to **GitHub Actions**, and the workflow needs `pages: write` and `id-token: write` permissions. Send a maintainer the URL of the failing Actions run.
+
+**A build failed and you do not know why**
+
+Open the Actions run, click the failed job, and expand the failed step. Read from the **top** of the error output — the first error is the real one; everything below it is usually consequence. Send a maintainer the run URL rather than a screenshot of the last line.
+
+---
+
+## Quick reference
+
+**Daily commands**
+
+```bash
+# Sync main before starting work
+git checkout main && git pull
+
+# Create a branch
+git checkout -b content/your-topic
+
+# Preview (live reload; does NOT run the metadata hook)
+quarto preview
+
+# Full render (do this before pushing)
+quarto render
+
+# HTML only, if you have no LaTeX
+quarto render --to html
+
+# Stage specific files
+git add chapters/NN-name.qmd
+git add _quarto.yml          # only if you edited the chapters list
+
+# Commit and push
+git commit -m "Add session: your chapter title"
+git push -u origin HEAD      # first push
+git push                     # afterwards
+```
+
+**SSH**
+
+```bash
+ssh -T git@github.com                              # is the key working?
+eval "$(ssh-agent -s)"                             # start the agent
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519     # load key (macOS)
+ssh-add ~/.ssh/id_ed25519                          # load key (Windows/Linux)
+git remote -v                                      # which URL is this repo using?
+git remote set-url origin git@github.com:govtmethods/REPONAME.git
+```
+
+**R, inside a book project**
+
+```r
+renv::restore()           # install locked packages after cloning
+renv::install("pkg")      # add a package
+renv::snapshot()          # record it in renv.lock — then commit the lockfile
+renv::status()            # does my library match the lockfile?
+```
+
+**Chapter YAML template**
+
+```yaml
+---
+title: "Your Session Title"
+author: "Your Full Name"
+date: Month DD, YYYY
+---
+```
+
+---
+
+## Maintainer notes
+
+This section is for whoever is running the infrastructure. Contributors can skip it.
+
+**What is custom here, and why.** Almost everything is stock Quarto. The deliberate exceptions:
+
+- `_scripts/build-chapter-meta.R` — a post-render hook that reads each chapter's YAML and writes `_book/chapters-meta.json`. Consumed by JS in `_quarto.yml` (sidebar author labels, index session cards) and, separately, by an R chunk in `index.qmd` for the PDF chapter listing.
+- `_filters/chapter-author.lua` — inserts the author and date beneath each chapter heading in the PDF only.
+- `_includes/gm-controls.html` — the home / PDF / theme buttons, mounted into the sidebar by script. Identical across both books apart from the PDF URL.
+- `styles.scss` — the `--gm-*` token system and dark mode via `data-theme`. The two books' copies are kept byte-identical; the landing site's copy differs deliberately (link colors), and those differences should not be "fixed."
+
+All three sites share one `localStorage` key (`gm_theme`), one attribute (`data-theme="dark"` on `<html>`), and one function (`window.__gmToggleTheme`), which is why a theme choice persists as a reader moves between them.
+
+**The governing constraint.** Contributors should only ever touch `.qmd` files and the `chapters:` list. Every piece of custom UI stays inside `_includes/` and `styles.scss`. Any new feature must preserve that — no per-chapter HTML blocks, no custom YAML beyond `title`/`author`/`date`.
+
+**Pages configuration.** Each repo publishes independently: **Settings → Pages → Source: GitHub Actions**, with the workflow holding `pages: write` and `id-token: write`. If a new repo is added to the org, it needs that setting flipped by hand before its first deploy will work.
+
+**Regenerating this guide as a PDF.** This page is HTML-first because the landing site's CI does not install LaTeX. To produce a PDF copy:
+
+```bash
+quarto render contributing.qmd --to pdf
+```
+
+The file lands in `_site/`, which is gitignored — treat it as an on-demand export, not a committed artifact. Producing it needs LaTeX locally (`quarto install tinytex`).
+
+Do not add a `pdf:` format to this file's front matter. The landing site's CI installs no LaTeX, so every build would then attempt a LaTeX run and fail. For the same reason, avoid executable `{r}` chunks on this site: the landing project's `renv` library has no knitr, and adding one would break the build.
+
+**Handover checklist.** Whoever takes this over needs: access to the `govtmethods` account, which owns all three repositories and is the only account that can change their settings or add collaborators; the Pages setting above confirmed on all three; and this guide updated so the names below are theirs.
+
+`govtmethods` is a personal account rather than an organisation, which means it has exactly one administrator and no role ladder — collaborators can only be granted write access. Converting to an organisation would fix that; it is a planned but deferred piece of work, and the procedure is written up separately in the maintainers' notes.
+
+---
+
+## Who to contact
+
+When something breaks, send a maintainer:
+
+1. Which repository you were in
+2. The exact command you ran
+3. The full error output, copied as text — not a screenshot
+4. For a CI failure, the link to the failing Actions run (e.g. `github.com/govtmethods/methodsbrownbag/actions/runs/12345`)
+
+**Current maintainers**
+
+- **Parushya** — infrastructure, CI, theme, access
+- **Sara Mohammadi** — content review, editorial standards
+
+If you are reading this after both have moved on, the [Maintainer notes](#maintainer-notes) above describe what the system does and what a successor needs.

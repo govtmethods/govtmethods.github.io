@@ -676,3 +676,127 @@ main.content p {
 h1.title {
   display: none !important;
 }
+
+/* ============================================================================
+   TECHNICAL PROSE — tables, code, keyboard keys
+   ----------------------------------------------------------------------------
+   The landing site runs `theme: none`, so there is no Bootstrap and therefore
+   no default styling for tables or code blocks. Prose pages (about, ask) never
+   needed any. The Contributor Guide does. These rules supply the minimum, using
+   the existing --gm-* token system so light/dark toggling keeps working.
+
+   NOTE ON SCOPING: with theme:none Quarto emits no <main class="content">, so
+   the ~41 `main.content` selectors earlier in this file never match anything.
+   Inner pages are centered by the `.gm-article-content` wrapper that
+   _includes/gm-sitenav.html injects at runtime — so that is what we scope to
+   here. Do not "correct" these to main.content.
+
+   Tokens added here rather than at the top so this block stays self-contained
+   and can be lifted out if the page ever moves.
+============================================================================ */
+
+:root {
+  --gm-code-bg: #f4f4f1;
+  --gm-code-fg: #1f2d3a;
+  --gm-code-border: rgba(31, 45, 58, 0.12);
+  --gm-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+             "Liberation Mono", monospace;
+}
+
+html[data-theme="dark"] {
+  --gm-code-bg: rgba(255, 255, 255, 0.055);
+  --gm-code-fg: rgba(255, 255, 255, 0.90);
+  --gm-code-border: rgba(255, 255, 255, 0.14);
+}
+
+/* ---- Tables ---- */
+.gm-article-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.6rem 0;
+  font-family: var(--gm-sans);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  display: block;
+  overflow-x: auto;          /* never let a wide table scroll the page */
+}
+
+.gm-article-content thead th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--gm-fg);
+  border-bottom: 1.5px solid var(--gm-rule);
+  padding: 0.55rem 0.9rem 0.55rem 0;
+  white-space: nowrap;
+}
+
+.gm-article-content tbody td {
+  vertical-align: top;
+  padding: 0.55rem 0.9rem 0.55rem 0;
+  border-bottom: 1px solid var(--gm-rule);
+  color: var(--gm-fg);
+}
+
+.gm-article-content tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- Inline code ---- */
+.gm-article-content code {
+  font-family: var(--gm-mono);
+  font-size: 0.875em;
+  background: var(--gm-code-bg);
+  color: var(--gm-code-fg);
+  padding: 0.12em 0.35em;
+  border-radius: 3px;
+  overflow-wrap: break-word;
+}
+
+/* ---- Code blocks ---- */
+.gm-article-content pre {
+  font-family: var(--gm-mono);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  background: var(--gm-code-bg);
+  color: var(--gm-code-fg);
+  border: 1px solid var(--gm-code-border);
+  border-radius: 5px;
+  padding: 0.9rem 1.1rem;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+}
+
+/* A code block's own <code> must not repeat the background/padding */
+.gm-article-content pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ---- Blockquote callouts (used for the "Important limitation" notes) ---- */
+.gm-article-content blockquote {
+  border-left: 3px solid var(--gm-rule);
+  background: var(--gm-code-bg);
+  padding: 0.8rem 1.1rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.gm-article-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Footnotes: smaller, muted, clearly separated from the body ---- */
+.gm-article-content .footnotes {
+  margin-top: 3rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--gm-rule);
+  font-size: 0.88rem;
+  color: var(--gm-muted);
+}
+
+.gm-article-content .footnotes p,
+.gm-article-content .footnotes li {
+  color: var(--gm-muted);
+}

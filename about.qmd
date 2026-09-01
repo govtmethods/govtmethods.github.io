@@ -97,6 +97,12 @@ An intensive refresher in mathematics, statistics, and computation held at the s
 
 ---
 
+## Contributing
+
+Sessions are written and maintained by graduate students. If you are presenting a session or joining as an editor, the [Contributor Guide](contributing.html) covers everything from setting up your machine to publishing a chapter — no prior Git experience assumed.
+
+---
+
 ## Contact
 
 Questions, suggestions, or contributions — reach us at [govtmethods@georgetown.edu](mailto:govtmethods@georgetown.edu).
