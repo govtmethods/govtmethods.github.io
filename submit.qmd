@@ -1,0 +1,68 @@
+---
+title: "Submitting a Session"
+subtitle: "How to get your Brown Bag or Math Camp material onto the site"
+page-layout: article
+toc: false
+date-modified: 2026-09-01
+---
+
+# Submitting a Session
+
+If you presented a session, or are about to, your material can go on this site as a chapter with your name on it.
+
+**You do not need a GitHub account, Git, or any software installed.** Send the files to an editor and they will do the rest. That is the whole process — the rest of this page is detail.
+
+---
+
+## What to send
+
+Whatever you already have. There is no required format, and you do not need to convert anything before sending.
+
+- **Slides** — PowerPoint, Keynote, PDF, Google Slides
+- **Notebooks** — Jupyter or Colab `.ipynb`
+- **Code** — R or Python scripts, in whatever state they ran in
+- **Data** — the files your examples use, if they can be shared
+- **Notes** — an outline, a draft, or a handout
+
+Send the originals rather than exports where you have a choice; an editor can extract images from a `.pptx` but cannot get them back out of a flattened PDF at usable quality.
+
+If you happen to write in Quarto or R Markdown already, send the `.qmd` or `.Rmd` and it will need almost no conversion. Nobody expects this.^[`.qmd` is "Quarto Markdown" — plain text with light formatting marks, where `**bold**` becomes **bold** and `# Heading` becomes a heading. It is what the chapters on this site are written in.]
+
+## What we need from you
+
+Three things, in the email:
+
+1. **Your name as you want it published.** This appears under the chapter title, in the sidebar, and in the PDF. Spelling and form are yours to choose.
+2. **The session date.** Chapters are ordered by when the session happened, not when the material arrives.
+3. **An email address for the credit trail** — the one you want attached to the published record.
+
+If your session used data that cannot be shared, say so, and the chapter will use a synthetic or public substitute instead.
+
+## What happens next
+
+1. An editor converts the material into a chapter — slides become prose with the figures kept, notebook cells become readable code blocks.
+2. It goes on the site under your name, with the session date, in both the web version and the PDF.
+3. You get a link, and you check it. **This step matters** — you are the only person who can confirm the author line, the date, and that nothing was mangled in conversion. Say so and it gets fixed.
+
+Editing is for format, not content. If something needs cutting or rewriting, an editor will ask you first.
+
+Turnaround is usually a week or two, faster outside the end of a semester.
+
+## Questions people ask
+
+**Does my material have to be polished?** No. Rough notes and working code are normal — most chapters started that way.
+
+**Can I update it later?** Yes. Send the changes to an editor whenever.
+
+**Can I take it down?** Yes, no explanation needed.
+
+**Who owns it?** You wrote it and you are credited as the author. The site's licensing terms are still being settled — if that matters to you, say so and it will be part of the conversation.
+
+**Can I write the chapter myself?** If you would rather do the whole thing — write it in Quarto and publish it directly — that means joining as an editor: repository access, and an afternoon of setup. Say so and we will walk you through it. Most presenters would rather not, which is exactly why the send-us-the-files route exists.
+
+## Who to send it to
+
+- **Parushya** — infrastructure, CI, theme, access
+- **Sara Mohammadi** — content review, editorial standards
+
+Either is fine.

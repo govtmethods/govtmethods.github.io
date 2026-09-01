@@ -99,7 +99,7 @@ An intensive refresher in mathematics, statistics, and computation held at the s
 
 ## Contributing
 
-Sessions are written and maintained by graduate students. If you are presenting a session or joining as an editor, the [Contributor Guide](contributing.html) covers everything from setting up your machine to publishing a chapter — no prior Git experience assumed.
+Sessions are written by the graduate students who present them. If you presented a session and want it on the site, [Submitting a Session](submit.html) explains what to send — no GitHub account, and nothing to install. Editors maintain the site itself; if you are joining as one, ask and we will get you set up.
 
 ---
 
