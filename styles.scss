@@ -33,8 +33,8 @@
   /* Paper + ink */
   --gm-bg: #fbfbf9;                  /* off-grey paper */
   --gm-fg: #1f2d3a;                  /* deep navy-charcoal ink */
-  --gm-muted: #3a3a3a;               /* body/secondary text */
-  --gm-rule: rgba(31, 45, 58, 0.18); /* divider/rules */
+  --gm-muted: #4a5560;               /* body/secondary text */
+  --gm-rule: rgba(31, 45, 58, 0.16); /* divider/rules */
 
   /* Links (keep “ink-like” by default; highlight only on hover) */
   --gm-link: rgba(31, 45, 58, 0.88);
@@ -42,7 +42,7 @@
 
   /* Typography (these fonts are loaded in _quarto.yml) */
   --gm-serif: "Libre Caslon Text", Georgia, "Times New Roman", serif;
-  --gm-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --gm-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   /* Layout */
   --gm-max: 1100px;                  /* max page width for the whole hero */
@@ -72,7 +72,7 @@ html[data-theme="dark"] {
   --gm-bg: #0f1114;                   /* dark grey */
   --gm-fg: rgba(255, 255, 255, 0.92);
   --gm-muted: rgba(255, 255, 255, 0.55);
-  --gm-rule: rgba(255, 255, 255, 0.16);
+  --gm-rule: rgba(255, 255, 255, 0.12);
 
   --gm-link: rgba(255, 255, 255, 0.86);
   --gm-title-hover: #ffd166;          /* DARK MODE hover highlight: yellow */
@@ -696,7 +696,7 @@ h1.title {
 ============================================================================ */
 
 :root {
-  --gm-code-bg: #f4f4f1;
+  --gm-code-bg: rgba(31, 45, 58, 0.06);
   --gm-code-fg: #1f2d3a;
   --gm-code-border: rgba(31, 45, 58, 0.12);
   --gm-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
@@ -704,7 +704,7 @@ h1.title {
 }
 
 html[data-theme="dark"] {
-  --gm-code-bg: rgba(255, 255, 255, 0.055);
+  --gm-code-bg: rgba(255, 255, 255, 0.07);
   --gm-code-fg: rgba(255, 255, 255, 0.90);
   --gm-code-border: rgba(255, 255, 255, 0.14);
 }
