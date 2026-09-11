@@ -465,6 +465,11 @@ html[data-theme="dark"] .gm-article-content a:hover { color: #ffe19a; }
   margin-top: 0.75rem;
 }
 
+.gm-contrib-season {
+  font-size: 1.05rem;
+  margin: 1.2rem 0 0.2rem;
+}
+
 .gm-contributor {
   padding: 0.75rem 1rem;
   border-left: 2px solid var(--gm-rule);
@@ -663,9 +668,12 @@ h1, h2, h3, h4, h5, h6 {
 /* The index is a title page and carries its own masthead, so Quarto's title
    block is hidden there only. gm-sitenav.html sets html.gm-index on load.
    Inner pages keep it: it is their one H1. */
-html.gm-index .quarto-title-block,
-html.gm-index #title-block-header,
-html.gm-index h1.title {
+/* Hook is gm-home, NOT gm-index: .gm-index is the card-list class and putting
+   it on <html> gave the whole page the list's 680px width. This file is served
+   as plain CSS (theme: none, no Sass pass), so comments must be slash-star. */
+html.gm-home .quarto-title-block,
+html.gm-home #title-block-header,
+html.gm-home h1.title {
   display: none !important;
 }
 

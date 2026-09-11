@@ -26,8 +26,7 @@ format:
 
   <div class="gm-index">
 
-    <!-- Same names, same order as the site nav in _includes/gm-sitenav.html.
-         The Notes card returns when /notes/ has content (TODO G-11). -->
+    <!-- Same names, same order as the site nav in _includes/gm-sitenav.html. -->
 
     <a href="/methodsbrownbag/" class="gm-item">
       <div class="gm-item-kicker">Workshop series</div>
@@ -39,6 +38,12 @@ format:
       <div class="gm-item-kicker">Training</div>
       <div class="gm-item-title">Math Camp</div>
       <p class="gm-item-desc">Refreshers in mathematics, statistics, and computation to start the year sharp.</p>
+    </a>
+
+    <a href="/notes/" class="gm-item">
+      <div class="gm-item-kicker">Research blog and newsletter</div>
+      <div class="gm-item-title">Call Your Methods!</div>
+      <p class="gm-item-desc">Short notes, snippets, and write-ups from the department, delivered as a newsletter.</p>
     </a>
 
     <a href="/about.html" class="gm-item">
@@ -61,7 +66,7 @@ format:
 
   </div>
 
-  <div class="gm-footer">2025–26</div>
+  <div class="gm-footer">2026–27</div>
 
 </div>
 ```

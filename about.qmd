@@ -6,23 +6,33 @@ toc: false
 
 Government Methods is a student-run initiative in the Department of Government at Georgetown University. Maintained by graduate students and supported by the Department, it gathers the tools, workflows, code, and conceptual frameworks we repeatedly return to in our research and teaching. The aim is not to create a comprehensive methods encyclopedia, but to build a shared working archive — careful, reproducible, and evolving — that strengthens how we design, implement, and communicate political science research.
 
+**Web editor:** Parushya
+
 ---
 
 ## Methods Brown Bag
 
-A recurring workshop series where graduate students present tools, workflows, and research design concepts — with reproducible examples in R and Quarto.
+A recurring workshop series where graduate students present tools, workflows, and research design concepts — with reproducible examples in R and Quarto. Each academic year is a season.
+
+**Organizers**
+
+- Season 2 (2026–27): Sara Mohammadi, Sieun
+- Season 1 (2025–26): Parushya, Sara Mohammadi
+
+**Sessions and presenters**
 
 ```{=html}
 <div id="gm-bb-contributors" class="gm-contributors">
-  <!-- populated from chapters-meta.json; static fallback below if fetch fails -->
+  <!-- populated from chapters-meta.json, grouped by season; static fallback below if fetch fails -->
   <noscript>
     <ul>
-      <li>Min Ha Kim</li>
+      <li>Diana Kazarian</li>
+      <li>Minha Kim</li>
       <li>Samirah Jaigirdar</li>
-      <li>Keeheon Lee</li>
-      <li>Alexander Rodrigous</li>
       <li>Rong Qin</li>
-      <li>Mohammad Hashem Krayem</li>
+      <li>Hashem Krayem</li>
+      <li>Alexander K. Rodriguez</li>
+      <li>John Severini</li>
       <li>Parushya</li>
     </ul>
   </noscript>
@@ -30,48 +40,56 @@ A recurring workshop series where graduate students present tools, workflows, an
 
 <script>
 (function () {
-  const BB_JSON = "https://govtmethods.github.io/methodsbrownbag/chapters-meta.json";
+  // Same-origin first (works on the live site and on a combined local
+  // render), then the live copy (works under `quarto preview`).
+  const BB_JSON_LOCAL = "/methodsbrownbag/chapters-meta.json";
+  const BB_JSON_LIVE  = "https://govtmethods.github.io/methodsbrownbag/chapters-meta.json";
   const BB_BASE = "https://govtmethods.github.io/methodsbrownbag/";
+  const FALLBACK = ["Diana Kazarian","Minha Kim","Samirah Jaigirdar","Rong Qin",
+                    "Hashem Krayem","Alexander K. Rodriguez","John Severini","Parushya"];
 
-  fetch(BB_JSON)
-    .then(function (r) { return r.json(); })
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  fetch(BB_JSON_LOCAL)
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .catch(function () { return fetch(BB_JSON_LIVE).then(function (r) { return r.json(); }); })
     .then(function (chapters) {
-      // Group chapters by author (handles comma-separated multi-author strings)
-      var map = {};
+      // Seasons are book parts, already newest-first in the JSON. Within a
+      // season, presenters are listed alphabetically with each of their sessions.
+      var seasons = [];
       chapters.forEach(function (c) {
-        var authors = c.author ? c.author.split(", ") : [];
-        authors.forEach(function (a) {
+        var key = c.part || "";
+        var s = seasons.find(function (x) { return x.part === key; });
+        if (!s) { s = { part: key, byAuthor: {} }; seasons.push(s); }
+        (c.author ? c.author.split(", ") : []).forEach(function (a) {
           a = a.trim();
           if (!a) return;
-          if (!map[a]) map[a] = [];
-          map[a].push(c);
+          if (!s.byAuthor[a]) s.byAuthor[a] = [];
+          s.byAuthor[a].push(c);
         });
       });
-
       var container = document.getElementById("gm-bb-contributors");
-      if (!container || Object.keys(map).length === 0) return;
+      if (!container || seasons.length === 0) return;
 
-      container.innerHTML = Object.keys(map).sort().map(function (author) {
-        var sessions = map[author].map(function (c) {
-          var date = c.date ? '<span class="gm-contrib-date">' + c.date + "</span>" : "";
-          return '<li><a href="' + BB_BASE + c.href + '">' + c.title + "</a>" + date + "</li>";
+      container.innerHTML = seasons.map(function (s) {
+        var heading = s.part ? '<h3 class="gm-contrib-season">' + esc(s.part) + "</h3>" : "";
+        var people = Object.keys(s.byAuthor).sort().map(function (author) {
+          var sessions = s.byAuthor[author].map(function (c) {
+            var date = c.date ? '<span class="gm-contrib-date">' + esc(c.date) + "</span>" : "";
+            return '<li><a href="' + BB_BASE + esc(c.href) + '">' + esc(c.title) + "</a>" + date + "</li>";
+          }).join("");
+          return '<div class="gm-contributor">' +
+            '<div class="gm-contrib-name">' + esc(author) + "</div>" +
+            "<ul>" + sessions + "</ul></div>";
         }).join("");
-        return '<div class="gm-contributor">' +
-          '<div class="gm-contrib-name">' + author + "</div>" +
-          "<ul>" + sessions + "</ul>" +
-          "</div>";
+        return heading + people;
       }).join("");
     })
     .catch(function () {
-      // Fetch failed (local preview) — show static list
       var container = document.getElementById("gm-bb-contributors");
       if (!container) return;
-      container.innerHTML =
-        "<ul>" +
-        ["Min Ha Kim","Samirah Jaigirdar","Keeheon Lee",
-         "Alexander Rodrigous","Rong Qin","Mohammad Hashem Krayem","Parushya"]
-        .map(function (n) { return "<li>" + n + "</li>"; }).join("") +
-        "</ul>";
+      container.innerHTML = "<ul>" + FALLBACK.map(function (n) { return "<li>" + n + "</li>"; }).join("") + "</ul>";
     });
 })();
 </script>
@@ -79,21 +97,25 @@ A recurring workshop series where graduate students present tools, workflows, an
 
 ---
 
-## Math Camp
+## Call Your Methods! Newsletter
 
-An intensive refresher in mathematics, statistics, and computation held at the start of the academic year.
+The research blog and newsletter of Government Methods — short technical notes, snippets, and write-ups, [archived here](/notes/).
 
-**Instructors**
+**Editors**
 
-- Mohammad Hashem Krayem
+- Diana Kazarian
 - Parushya
 
 ---
 
-## Editors
+## Math and Programming Camp
 
-- Sara Mohammadi
-- Parushya
+An intensive refresher in mathematics, statistics, and computation held at the start of the academic year. [Every edition](/mathcamp/) is published as its own site.
+
+**Instructors**
+
+- 2026: Parushya and Rong Qin
+- 2024, 2025: Mohammad Hashem Krayem and Parushya
 
 ---
 

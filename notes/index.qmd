@@ -1,11 +1,12 @@
 ---
-title: "Notes"
+title: "Call Your Methods!"
+subtitle: "The research blog and newsletter of Government Methods"
 page-layout: article
 toc: false
 ---
 
-This section is being built.
+Short technical notes, snippets, templates, and write-ups from the department, sent out as a newsletter and archived here.
 
-We are collecting short technical notes — snippets, templates, and write-ups we reach for often — and will publish them here as they are ready.
+The first issues are in preparation. Until then, the [Methods Brown Bag](/methodsbrownbag/) sessions and [Math Camp](/mathcamp/) materials are live.
 
-In the meantime, the [Methods Brown Bag](/methodsbrownbag/) sessions and [Math Camp](/mathcamp/) materials are live.
+**Editors:** Diana Kazarian and Parushya.
