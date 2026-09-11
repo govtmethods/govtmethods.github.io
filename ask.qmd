@@ -15,4 +15,4 @@ We welcome questions and suggestions that would benefit others in the department
 
 Submissions may lead to a brown bag session, a short technical note, or an addition to our shared archive.
 
-- *(Later: link a Google Form, GitHub issue template, or departmental email.)*
+Send yours to [govtmethods@georgetown.edu](mailto:govtmethods@georgetown.edu).

@@ -97,12 +97,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide common Quarto header/title blocks aggressively */
+/* Hide Quarto's navbar chrome; the site nav is our own include */
 .navbar,
 header.navbar,
 #quarto-header,
-.quarto-title-banner,
-.quarto-title-block {
+.quarto-title-banner {
   display: none !important;
 }
 
@@ -114,10 +113,6 @@ main,
 #quarto-content {
   margin: 0;
   padding: 0;
-}
-
-main.content {
-  padding-top: 0 !important;
 }
 
 
@@ -283,9 +278,8 @@ html[data-theme="dark"] .gm-item:hover {
 /* small “section label” */
 .gm-item-kicker {
   font-family: var(--gm-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
   color: var(--gm-muted);
   margin-bottom: 0.2rem;
 }
@@ -366,99 +360,97 @@ html[data-theme="dark"] .gm-item:hover {
    - No HTML wrappers needed in about.qmd / ask.qmd
 
    How it works:
-   - Quarto renders page content inside main.content
-   - We style main.content to behave like a journal article page:
-       * narrow text column
+   - With theme:none Quarto emits no <main class="content">. Inner pages are
+     wrapped at runtime in .gm-article-content by _includes/gm-sitenav.html,
+     so every prose rule is scoped to that wrapper. (Until 2026-09 these were
+     written against main.content and matched nothing — prose links rendered
+     in browser-default blue/purple. See DECISIONS.md.)
+   - The wrapper behaves like a journal article page:
+       * narrow text column (sized in section 13)
        * left aligned
        * serif headings, sans body
-       * subtle links
+       * visible blue links
 ============================================================================ */
 
-/* Main text column for all non-landing pages */
-main.content {
-  max-width: min(760px, 94%);
-  margin: 0 auto;
-  padding: var(--gm-s5) var(--gm-s4);
-  text-align: left;
-
-  /* overwrite earlier “Remove unexpected padding constraints” reset */
-  /* (you set main/content padding:0 earlier; this re-adds it intentionally) */
-}
-
 /* Page titles + headings (Quarto markdown) */
-main.content h1,
-main.content h2,
-main.content h3,
-main.content h4 {
+.gm-article-content h1,
+.gm-article-content h2,
+.gm-article-content h3,
+.gm-article-content h4 {
   font-family: var(--gm-serif);
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--gm-fg);
 }
 
-main.content h1 {
+/* The page title. Quarto renders the YAML title as h1.title inside
+   #title-block-header; on inner pages that is the one H1 and pages must not
+   repeat it in the body. (The index hides it — see section 13.) */
+.gm-article-content h1 {
   font-size: clamp(1.8rem, 2.2vw, 2.4rem);
   line-height: 1.15;
   margin-top: 0;
   margin-bottom: var(--gm-s2);
 }
 
-main.content h2 {
+.gm-article-content .subtitle {
+  font-family: var(--gm-sans);
+  font-size: 1.02rem;
+  color: var(--gm-muted);
+  margin: 0 0 var(--gm-s3) 0;
+}
+
+.gm-article-content h2 {
   font-size: 1.35rem;
   margin-top: var(--gm-s4);
   margin-bottom: var(--gm-s2);
 }
 
-main.content h3 {
+.gm-article-content h3 {
   font-size: 1.15rem;
   margin-top: var(--gm-s3);
   margin-bottom: var(--gm-s1);
 }
 
 /* Body text */
-main.content p,
-main.content li {
+.gm-article-content p,
+.gm-article-content li,
+.gm-article-content td,
+.gm-article-content th {
   font-family: var(--gm-sans);
+  font-weight: 400;
   line-height: 1.65;
   color: var(--gm-fg);
 }
 
-main.content p {
+.gm-article-content p {
   margin-bottom: 0.95rem;
 }
 
 /* Lists feel tighter like a journal note */
-main.content ul,
-main.content ol {
+.gm-article-content ul,
+.gm-article-content ol {
   padding-left: 1.25rem;
 }
 
 /* Links in prose: visible blue, underline on hover */
-main.content a {
+.gm-article-content a {
   color: #1f5ea8;
   text-decoration: none;
   text-underline-offset: 2px;
 }
 
-main.content a:hover {
+.gm-article-content a:hover {
   color: #17497f;
   text-decoration: underline;
   text-decoration-color: currentColor;
 }
 
-html[data-theme="dark"] main.content a { color: #ffd166; }
-html[data-theme="dark"] main.content a:hover { color: #ffe19a; }
-
-/* Blockquotes: “note” look */
-main.content blockquote {
-  margin: var(--gm-s3) 0;
-  padding: 0.8rem 1rem;
-  border-left: 2px solid var(--gm-rule);
-  color: var(--gm-muted);
-}
+html[data-theme="dark"] .gm-article-content a { color: #ffd166; }
+html[data-theme="dark"] .gm-article-content a:hover { color: #ffe19a; }
 
 /* Horizontal rules inside pages */
-main.content hr {
+.gm-article-content hr {
   border: none;
   height: 1px;
   background: var(--gm-rule);
@@ -522,14 +514,24 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
 }
 
 /* ============================================================================
-   12) GLOBAL THEME TOGGLE (fixed, all pages)
+   12) GLOBAL THEME TOGGLE
    ============================================================================
-   Used when you inject the toggle via include-before-body in _quarto.yml.
-   This avoids having to add toggle HTML to each page.
-
-   If you KEEP the landing page’s in-flow toggle, you will see two toggles.
-   Recommended: remove the landing toggle HTML, and rely on this fixed one.
+   Injected once via include-before-body (_includes/gm-toggle.html). On the
+   index it floats top-right over the title page. On inner pages
+   gm-sitenav.html moves it into the nav bar, where the books keep theirs, so
+   the same control sits in the same place on all three sites.
 ============================================================================ */
+
+.gm-sitenav .gm-theme-toggle {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+}
+
+.gm-sitenav .gm-theme-icon {
+  width: 15px;
+  height: 15px;
+}
 
 .gm-theme-toggle--fixed {
   position: fixed;
@@ -540,10 +542,6 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
 }
 
 @media (max-width: 560px) {
-  main.content {
-    padding: var(--gm-s4) var(--gm-s3);
-  }
-
   .gm-theme-toggle--fixed {
     top: 14px;
     right: 14px;
@@ -562,6 +560,7 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   padding: 0.7rem 1.4rem;
   border-bottom: 1px solid var(--gm-rule);
   background: var(--gm-bg);
@@ -589,8 +588,14 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
   display: flex;
   align-items: center;
   gap: 1.4rem;
-  padding-right: 3.2rem; /* clear the fixed theme toggle */
+  margin-left: auto;   /* keeps links + toggle together at the right */
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.gm-sitenav-links::-webkit-scrollbar { display: none; }
 
 .gm-sitenav-links a {
   font-family: var(--gm-sans);
@@ -631,7 +636,6 @@ html[data-theme="dark"] .gm-contributor li a:hover { color: #ffe19a; }
 
   .gm-sitenav-links {
     gap: 0.9rem;
-    padding-right: 2.8rem;
   }
 
   .gm-sitenav-links a {
@@ -652,28 +656,16 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.01em;
 }
 
-/* Markdown prose (About / Ask / future pages) */
-main.content p,
-main.content li,
-main.content blockquote,
-main.content td,
-main.content th {
-  font-family: var(--gm-sans);
-}
-
-main.content p {
-  font-weight: 400;
-}
-
 .gm-lede {
   font-weight: 400;
 }
 
-/* Hide Quarto-rendered page title (keep it in <title> metadata for previews) */
-.quarto-title-block,
-#title-block-header,
-.quarto-title,
-h1.title {
+/* The index is a title page and carries its own masthead, so Quarto's title
+   block is hidden there only. gm-sitenav.html sets html.gm-index on load.
+   Inner pages keep it: it is their one H1. */
+html.gm-index .quarto-title-block,
+html.gm-index #title-block-header,
+html.gm-index h1.title {
   display: none !important;
 }
 
@@ -685,11 +677,10 @@ h1.title {
    needed any. The Contributor Guide does. These rules supply the minimum, using
    the existing --gm-* token system so light/dark toggling keeps working.
 
-   NOTE ON SCOPING: with theme:none Quarto emits no <main class="content">, so
-   the ~41 `main.content` selectors earlier in this file never match anything.
+   NOTE ON SCOPING: with theme:none Quarto emits no <main class="content">.
    Inner pages are centered by the `.gm-article-content` wrapper that
-   _includes/gm-sitenav.html injects at runtime — so that is what we scope to
-   here. Do not "correct" these to main.content.
+   _includes/gm-sitenav.html injects at runtime — everything prose-related in
+   this file is scoped to it. Do not "correct" these to main.content.
 
    Tokens added here rather than at the top so this block stays self-contained
    and can be lifted out if the page ever moves.

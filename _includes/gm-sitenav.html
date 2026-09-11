@@ -11,10 +11,15 @@
 <script>
   (function () {
     var p = window.location.pathname;
-    var isIndex = (p === "/" || p === "/index.html" || p.endsWith("/index.html"));
+    // Site root only. A bare endsWith("/index.html") also matched
+    // /notes/index.html and stripped that page of its nav and title.
+    var isIndex = (p === "/" || p === "/index.html");
 
     if (isIndex) {
-      // Hide nav on the home page — it has its own full-page navigation
+      // Hide nav on the home page — it has its own full-page navigation.
+      // The class lets styles.scss hide Quarto's title block here only;
+      // inner pages keep it as their one H1.
+      document.documentElement.classList.add("gm-index");
       var nav = document.getElementById("gm-sitenav");
       if (nav) nav.style.display = "none";
       return;
@@ -28,9 +33,20 @@
       }
     });
 
-    // Wrap page body content (everything except sitenav + fixed toggle)
-    // in a centering div, since theme:none produces no main/content wrapper.
     document.addEventListener("DOMContentLoaded", function () {
+      // Move the theme toggle into the nav bar, where the books keep theirs.
+      // Its click handler is delegated on document, so position is free.
+      // It goes after the links strip, not inside it: the strip scrolls
+      // horizontally on narrow screens and would carry the toggle off-screen.
+      var toggle = document.querySelector(".gm-theme-toggle--fixed");
+      var nav = document.getElementById("gm-sitenav");
+      if (toggle && nav) {
+        toggle.classList.remove("gm-theme-toggle--fixed");
+        nav.appendChild(toggle);
+      }
+
+      // Wrap page body content (everything except the sitenav) in a
+      // centering div, since theme:none produces no main/content wrapper.
       var wrapper = document.createElement("div");
       wrapper.className = "gm-article-content";
       var toWrap = Array.from(document.body.children).filter(function (el) {

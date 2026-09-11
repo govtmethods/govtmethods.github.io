@@ -8,7 +8,7 @@ Government Methods is a student-run initiative in the Department of Government a
 
 ---
 
-## Brown Bag Series
+## Methods Brown Bag
 
 A recurring workshop series where graduate students present tools, workflows, and research design concepts — with reproducible examples in R and Quarto.
 

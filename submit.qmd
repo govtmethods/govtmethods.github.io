@@ -6,8 +6,6 @@ toc: false
 date-modified: 2026-09-01
 ---
 
-# Submitting a Session
-
 If you presented a session, or are about to, your material can go on this site as a chapter with your name on it.
 
 **You do not need a GitHub account, Git, or any software installed.** Send the files to an editor and they will do the rest. That is the whole process — the rest of this page is detail.

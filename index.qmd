@@ -26,33 +26,36 @@ format:
 
   <div class="gm-index">
 
+    <!-- Same names, same order as the site nav in _includes/gm-sitenav.html.
+         The Notes card returns when /notes/ has content (TODO G-11). -->
+
     <a href="/methodsbrownbag/" class="gm-item">
-      <div class="gm-item-kicker">Workshop Series</div>
-      <div class="gm-item-title">methods.brown.bag</div>
+      <div class="gm-item-kicker">Workshop series</div>
+      <div class="gm-item-title">Methods Brown Bag</div>
       <p class="gm-item-desc">Sessions on tools, workflows, and research design — with reproducible examples.</p>
     </a>
 
     <a href="/mathcamp/" class="gm-item">
       <div class="gm-item-kicker">Training</div>
-      <div class="gm-item-title">math.camp</div>
+      <div class="gm-item-title">Math Camp</div>
       <p class="gm-item-desc">Refreshers in mathematics, statistics, and computation to start the year sharp.</p>
-    </a>
-
-    <a href="/notes/" class="gm-item">
-      <div class="gm-item-kicker">Reference</div>
-      <div class="gm-item-title">notes</div>
-      <p class="gm-item-desc">Snippets, templates, and technical write-ups we reach for often.</p>
     </a>
 
     <a href="/about.html" class="gm-item">
       <div class="gm-item-kicker">Project</div>
-      <div class="gm-item-title">about</div>
-      <p class="gm-item-desc">Who runs this, how it’s organized, and how to contribute.</p>
+      <div class="gm-item-title">About</div>
+      <p class="gm-item-desc">Who runs this, how it’s organized, and who edits it.</p>
+    </a>
+
+    <a href="/submit.html" class="gm-item">
+      <div class="gm-item-kicker">For presenters</div>
+      <div class="gm-item-title">Submitting a session</div>
+      <p class="gm-item-desc">Send what you have and an editor turns it into a chapter under your name.</p>
     </a>
 
     <a href="/ask.html" class="gm-item">
       <div class="gm-item-kicker">Contact</div>
-      <div class="gm-item-title">ask.a.question</div>
+      <div class="gm-item-title">Ask a question</div>
       <p class="gm-item-desc">Suggest a session, request a resource, or flag something to fix.</p>
     </a>
 
