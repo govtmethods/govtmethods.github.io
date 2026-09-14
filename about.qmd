@@ -30,6 +30,8 @@ A recurring workshop series where graduate students present tools, workflows, an
       <li>Minha Kim</li>
       <li>Samirah Jaigirdar</li>
       <li>Rong Qin</li>
+      <li>Keeheon Lee</li>
+      <li>Sara Mohammadi</li>
       <li>Hashem Krayem</li>
       <li>Alexander K. Rodriguez</li>
       <li>John Severini</li>
@@ -46,7 +48,8 @@ A recurring workshop series where graduate students present tools, workflows, an
   const BB_JSON_LIVE  = "https://govtmethods.github.io/methodsbrownbag/chapters-meta.json";
   const BB_BASE = "https://govtmethods.github.io/methodsbrownbag/";
   const FALLBACK = ["Diana Kazarian","Minha Kim","Samirah Jaigirdar","Rong Qin",
-                    "Hashem Krayem","Alexander K. Rodriguez","John Severini","Parushya"];
+                    "Keeheon Lee","Sara Mohammadi","Hashem Krayem",
+                    "Alexander K. Rodriguez","John Severini","Parushya"];
 
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
     return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
