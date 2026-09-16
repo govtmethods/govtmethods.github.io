@@ -3,6 +3,7 @@ project:
   render:
     - "*.qmd"
     - "notes/*.qmd"
+    - "notes/posts/*.qmd"
     - "!dev/**"
 
 website:
@@ -14,12 +15,19 @@ format:
   html:
     page-layout: full
     theme: none
+    # Post dates are written as 2026-10-02 in front matter; render them the way
+    # the /notes/ listing does rather than as a bare ISO string.
+    date-format: "D MMMM YYYY"
     css: styles.scss
     embed-resources: true
 
     include-before-body:
       - _includes/gm-sitenav.html
       - _includes/gm-toggle.html
+      # Drives every rotating card ([data-gm-ticker]) on /notes/. A bare
+      # <script> is skipped by the article wrapper in gm-sitenav.html, so it
+      # can sit here rather than in the header block.
+      - _includes/gm-ticker.html
 
     header-includes: |
       <!-- Fonts -->

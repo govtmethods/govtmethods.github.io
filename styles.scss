@@ -799,3 +799,393 @@ html[data-theme="dark"] {
 .gm-article-content .footnotes li {
   color: var(--gm-muted);
 }
+
+
+/* ----------------------------------------------------------------------------
+   15) CALL YOUR METHODS! — CARDS (/notes/)
+   ----------------------------------------------------------------------------
+   Three cards open the page: "Latest" (one entry, in full), "Earlier" (three
+   compact rows) and "New in the journals" (three articles, full width). All
+   three rotate through their contents via _includes/gm-ticker.html.
+
+   Controls:
+   - Two-up vs. stacked: .gm-cards grid-template-columns, and the 760px query
+   - Card chrome: .gm-card border/padding/radius
+   - Card label: .gm-card-head
+---------------------------------------------------------------------------- */
+.gm-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gm-s3);
+  margin: var(--gm-s4) 0 var(--gm-s3);
+}
+
+.gm-card {
+  border: 1px solid var(--gm-rule);
+  border-radius: 12px;
+  padding: 0.95rem 1.1rem 1.05rem;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* let long titles wrap instead of stretching the grid column */
+}
+
+.gm-card--wide {
+  margin-bottom: var(--gm-s4);
+}
+
+.gm-card-head {
+  display: block;
+  font-family: var(--gm-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--gm-rule);
+}
+
+.gm-card-foot {
+  display: block;
+  margin-top: 0.7rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--gm-rule);
+  font-family: var(--gm-sans);
+  font-size: 0.78rem;
+  color: var(--gm-muted);
+}
+
+/* ---- The Latest card: one entry, shown in full ---- */
+.gm-feature {
+  display: block;
+  padding: 0.75rem 0 0.2rem;
+}
+
+.gm-feature-date {
+  display: block;
+  font-family: var(--gm-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  margin-bottom: 0.3rem;
+}
+
+.gm-feature-title {
+  display: block;
+  font-family: var(--gm-serif);
+  font-weight: 700;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  color: var(--gm-link);
+  transition: color 140ms ease;
+}
+
+.gm-feature-author {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--gm-sans);
+  font-size: 0.85rem;
+  color: var(--gm-muted);
+}
+
+.gm-feature-desc {
+  display: block;
+  margin-top: 0.45rem;
+  font-family: var(--gm-sans);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--gm-muted);
+}
+
+/* Same rule as everywhere else on the site: only the title brightens. */
+.gm-feature:hover .gm-feature-title,
+.gm-feature:focus-visible .gm-feature-title {
+  color: var(--gm-title-hover);
+}
+
+.gm-item-cats {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.gm-cat {
+  font-family: var(--gm-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  border: 1px solid var(--gm-rule);
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
+}
+
+.gm-empty {
+  font-family: var(--gm-sans);
+  font-size: 0.92rem;
+  color: var(--gm-muted);
+  margin: 0.8rem 0 0;
+}
+
+/* Quarto's empty-filter message. It ships hidden by Bootstrap's .d-none,
+   which `theme: none` does not load, so it shows on every listing. There is
+   no filter or search UI on these listings for it to ever be the answer to. */
+.listing-no-matching {
+  display: none;
+}
+
+
+/* ----------------------------------------------------------------------------
+   16) ENTRY ROWS — the Earlier card and the full list below it
+   ----------------------------------------------------------------------------
+   Date in a left column, title and description to the right, a rule between
+   rows. The same row is used compactly inside a card (.gm-row--card) and at
+   full width under "All entries".
+
+   Controls:
+   - Date column width: .gm-row grid-template-columns
+   - Rule between rows: .gm-row border-bottom
+---------------------------------------------------------------------------- */
+.gm-rowlist {
+  margin: var(--gm-s3) 0 var(--gm-s4);
+}
+
+.gm-row {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0 1rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--gm-rule);
+}
+
+.gm-rowlist .gm-row:first-child {
+  border-top: 1px solid var(--gm-rule);
+}
+
+.gm-row-date {
+  font-family: var(--gm-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  white-space: nowrap;
+}
+
+.gm-row-main {
+  display: block;
+  min-width: 0;
+}
+
+.gm-row-title {
+  display: block;
+  font-family: var(--gm-serif);
+  font-size: 1.05rem;
+  line-height: 1.3;
+  color: var(--gm-link);
+  transition: color 140ms ease;
+}
+
+.gm-row-desc {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: var(--gm-sans);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--gm-muted);
+}
+
+.gm-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.gm-row-author {
+  font-family: var(--gm-sans);
+  font-size: 0.8rem;
+  color: var(--gm-muted);
+  margin-right: 0.15rem;
+}
+
+.gm-row:hover .gm-row-title,
+.gm-row:focus-visible .gm-row-title {
+  color: var(--gm-title-hover);
+}
+
+/* Inside the Earlier card: narrower date column, no rule on the last visible
+   row, tighter rhythm. */
+.gm-row--card {
+  /* Wide enough for "18 Sept 2026" without the date crowding the title. */
+  grid-template-columns: 6.4rem 1fr;
+  gap: 0 0.9rem;
+  padding: 0.7rem 0;
+}
+
+.gm-row--card .gm-row-title {
+  font-size: 0.98rem;
+}
+
+/* Inside a rotating card the last row is whichever one happens to be at the
+   bottom, so rules go *between* rows -- a border-bottom would leave a stray
+   line hanging on the card's edge. */
+.gm-ticker-track .gm-row--card,
+.gm-ticker-track .gm-tick {
+  border-bottom: none;
+}
+
+.gm-ticker-track .gm-row--card + .gm-row--card,
+.gm-ticker-track .gm-tick + .gm-tick {
+  border-top: 1px solid var(--gm-rule);
+}
+
+
+/* ----------------------------------------------------------------------------
+   17) THE ROTATION WINDOW
+   ----------------------------------------------------------------------------
+   Shared by all three cards. The height is set by _includes/gm-ticker.html
+   from the rows actually on show, because a wrapped two-line title is the
+   common case, not the exception -- a fixed CSS height clips it.
+
+   Controls:
+   - How many rows show: data-rows on the card (markup, not CSS)
+   - Fallback height before the script runs: .gm-ticker max-height
+---------------------------------------------------------------------------- */
+.gm-ticker {
+  max-height: 17rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.gm-ticker-track {
+  will-change: transform;
+}
+
+/* Whole-card links: the prose link colour and underline would fight the
+   title-only hover rule that the rest of the site uses. */
+.gm-article-content .gm-feature,
+.gm-article-content .gm-feature:hover,
+.gm-article-content .gm-row,
+.gm-article-content .gm-row:hover,
+.gm-article-content .gm-tick,
+.gm-article-content .gm-tick:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-ticker-track {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+
+/* ----------------------------------------------------------------------------
+   18) JOURNAL ARTICLES — the journals card and /notes/journals.html
+   ----------------------------------------------------------------------------
+   Rows are written by _scripts/fetch-journals.py from Crossref.
+
+   Controls:
+   - Kicker line (date, journal, issue): .gm-tick-meta
+   - Month headings on the full page: .gm-tick-month
+---------------------------------------------------------------------------- */
+.gm-tick {
+  display: block;
+  box-sizing: border-box;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.gm-tick-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  font-family: var(--gm-sans);
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--gm-muted);
+  margin-bottom: 0.2rem;
+}
+
+.gm-tick-src {
+  opacity: 0.85;
+}
+
+.gm-tick-title {
+  display: block;
+  font-family: var(--gm-serif);
+  font-size: 1.02rem;
+  line-height: 1.3;
+  color: var(--gm-link);
+  transition: color 140ms ease;
+}
+
+.gm-tick:hover .gm-tick-title,
+.gm-tick:focus-visible .gm-tick-title {
+  color: var(--gm-title-hover);
+}
+
+.gm-tick-authors {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--gm-sans);
+  font-size: 0.85rem;
+  color: var(--gm-muted);
+}
+
+/* ---- Full list (journals.html) ---- */
+.gm-ticklist .gm-tick--listed {
+  border-bottom: 1px solid var(--gm-rule);
+}
+
+.gm-ticklist .gm-tick--listed:last-child {
+  border-bottom: none;
+}
+
+.gm-tick-month {
+  font-family: var(--gm-sans) !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gm-muted) !important;
+  margin: var(--gm-s4) 0 0.3rem !important;
+}
+
+.gm-tick-month:first-child {
+  margin-top: var(--gm-s3) !important;
+}
+
+.gm-tick-source {
+  margin-top: var(--gm-s4);
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--gm-rule);
+  font-family: var(--gm-sans);
+  font-size: 0.85rem;
+  color: var(--gm-muted);
+}
+
+
+/* ----------------------------------------------------------------------------
+   19) CALL YOUR METHODS! — NARROW SCREENS
+---------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .gm-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Stack the date above the title rather than squeezing both into a row. */
+  .gm-row,
+  .gm-row--card {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}

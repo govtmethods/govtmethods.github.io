@@ -26,12 +26,21 @@
       return;
     }
 
-    // Mark current page link
+    // Mark current page link. Resolve the href first: Quarto rewrites the
+    // site-absolute hrefs written above into page-relative ones ("../notes/"),
+    // so comparing the raw attribute against the path never matched and no
+    // inner page was ever marked. A directory target matches by prefix, so
+    // /notes/posts/foo.html keeps "Newsletter" lit; a page target matches
+    // exactly. Keep both tests narrow -- a loose match once had "/" matching
+    // /notes/index.html, which stripped that page of its nav entirely.
     document.querySelectorAll(".gm-sitenav-links a").forEach(function (a) {
-      var href = a.getAttribute("href") || "";
-      if (href && p.endsWith(href.replace(/^\//, ""))) {
-        a.setAttribute("aria-current", "page");
-      }
+      var href = a.getAttribute("href");
+      if (!href) return;
+      var target = new URL(href, window.location.href).pathname;
+      var hit = target.endsWith("/")
+        ? p.indexOf(target) === 0
+        : p === target;
+      if (hit) a.setAttribute("aria-current", "page");
     });
 
     document.addEventListener("DOMContentLoaded", function () {

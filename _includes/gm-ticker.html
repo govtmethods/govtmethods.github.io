@@ -1,0 +1,116 @@
+<script>
+  // One rotation engine for every card that scrolls: the Latest and Earlier
+  // entry cards on /notes/, and the journals card below them. A card opts in
+  // with data-gm-ticker and declares how many rows it shows with data-rows.
+  // The rows themselves are plain anchors in document order, so with
+  // JavaScript off, or motion reduced, each card is a readable static list of
+  // the newest few.
+  //
+  // Cards sharing a data-gm-ticker-sync value step together and pause
+  // together. That is what keeps Latest and Earlier from drifting onto the
+  // same entry: Earlier's rows start one entry further down the same list, so
+  // as long as both advance on the same tick, it always trails by exactly one.
+  (function () {
+    var STEP_MS = 6000;    // how long a row stays on screen
+    var SLIDE_MS = 900;    // how long the slide itself takes
+    var STAGGER_MS = 2000; // offset between groups, so they never jump together
+
+    function setup(card) {
+      var frame = card.querySelector(".gm-ticker");
+      var track = card.querySelector(".gm-ticker-track");
+      if (!frame || !track) return null;
+
+      var visible = parseInt(card.getAttribute("data-rows") || "3", 10);
+
+      // Rows are not all the same height -- titles wrap -- so size the window
+      // to whichever rows are currently on show, and again when the column
+      // width changes. A CSS height in `em` clips the tall ones.
+      function fit() {
+        var rows = track.children, height = 0;
+        for (var i = 0; i < visible && i < rows.length; i++) {
+          height += rows[i].getBoundingClientRect().height;
+        }
+        if (height) frame.style.maxHeight = Math.ceil(height) + "px";
+      }
+
+      fit();
+      window.addEventListener("resize", fit);
+
+      // Measure again once the web fonts have swapped in: Libre Caslon is
+      // taller than the fallback, so a title that fits at first paint can wrap
+      // to a second line a moment later and be clipped.
+      window.addEventListener("load", fit);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(fit);
+      }
+
+      return {
+        frame: frame,
+        track: track,
+        // Nothing to rotate through if every row is already on screen.
+        rotates: track.children.length > visible,
+        step: function () {
+          var first = track.firstElementChild;
+          var height = first.getBoundingClientRect().height;
+          track.style.transition = "transform " + SLIDE_MS + "ms ease";
+          track.style.transform = "translateY(-" + height + "px)";
+          window.setTimeout(function () {
+            track.style.transition = "none";
+            track.style.transform = "translateY(0)";
+            track.appendChild(first);
+            fit();
+          }, SLIDE_MS + 50);
+        }
+      };
+    }
+
+    function init() {
+      var cards = document.querySelectorAll("[data-gm-ticker]");
+      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var groups = [], byName = {};
+
+      Array.prototype.forEach.call(cards, function (card, index) {
+        var unit = setup(card);
+        if (!unit) return;
+
+        var name = card.getAttribute("data-gm-ticker-sync") || "solo-" + index;
+        if (!byName[name]) {
+          byName[name] = { units: [], paused: false };
+          groups.push(byName[name]);
+        }
+        byName[name].units.push(unit);
+      });
+
+      if (reduced) return;
+
+      groups.forEach(function (group, index) {
+        var movers = group.units.filter(function (u) { return u.rotates; });
+        if (!movers.length) return;
+
+        // Hovering or tabbing into any card of a group holds the whole group,
+        // so a synced pair cannot drift apart while one of them is paused.
+        group.units.forEach(function (unit) {
+          ["mouseenter", "focusin"].forEach(function (e) {
+            unit.frame.addEventListener(e, function () { group.paused = true; });
+          });
+          ["mouseleave", "focusout"].forEach(function (e) {
+            unit.frame.addEventListener(e, function () { group.paused = false; });
+          });
+        });
+
+        window.setTimeout(function () {
+          window.setInterval(function () {
+            if (group.paused || document.hidden) return;
+            movers.forEach(function (unit) { unit.step(); });
+          }, STEP_MS);
+        }, index * STAGGER_MS);
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+</script>

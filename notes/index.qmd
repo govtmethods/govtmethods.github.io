@@ -3,10 +3,32 @@ title: "Call Your Methods!"
 subtitle: "The research blog and newsletter of Government Methods"
 page-layout: article
 toc: false
+listing:
+  - id: gm-cards
+    contents: posts
+    sort: "date desc"
+    type: custom
+    template: _cards.ejs
+    fields: [title, description, author, date, categories]
+    feed: false
+  - id: gm-posts
+    contents: posts
+    sort: "date desc"
+    type: custom
+    template: _listing.ejs
+    fields: [title, description, author, date, categories]
+    feed: false
 ---
 
-Short technical notes, snippets, templates, and write-ups from the department, sent out as a newsletter and archived here.
+Short technical notes, snippets, templates, and write-ups from the department, sent out
+as a newsletter and archived here. **Editors:** Diana Kazarian and Parushya.
 
-The first issues are in preparation. Until then, the [Methods Brown Bag](/methodsbrownbag/) sessions and [Math Camp](/mathcamp/) materials are live.
+::: {#gm-cards}
+:::
 
-**Editors:** Diana Kazarian and Parushya.
+{{< include _journals-ticker.qmd >}}
+
+## All entries
+
+::: {#gm-posts}
+:::

@@ -1,0 +1,21 @@
+---
+title: "What's New in the Journals"
+subtitle: "Recent articles in political methodology, refreshed monthly"
+page-layout: article
+toc: false
+---
+
+Everything published in the last four months by the four journals we read closely,
+newest first. Every title links to the publisher.
+
+{{< include _journals-list.qmd >}}
+
+::: {.gm-tick-source}
+Sources: [Political Analysis](https://www.cambridge.org/core/journals/political-analysis),
+[Journal of Experimental Political Science](https://www.cambridge.org/core/journals/journal-of-experimental-political-science),
+[Public Opinion Quarterly](https://academic.oup.com/poq), and
+[Political Science Research and Methods](https://www.cambridge.org/core/journals/political-science-research-and-methods).
+Article metadata comes from [Crossref](https://www.crossref.org/); *FirstView* and
+*Advance Access* mark articles published online but not yet assigned to an issue.
+This page is rebuilt whenever the site deploys, and at least once a month.
+:::

@@ -1,0 +1,15 @@
+---
+title: "A short, specific title"
+author: "Your name"
+date: "2026-10-02"
+description: "One or two sentences in plain language. This is what shows on the
+  /notes/ listing, and what you can paste straight into the email newsletter."
+categories: [R, inference]
+---
+
+Copy this file to `notes/posts/YYYY-MM-DD-slug.qmd` — the date in the filename
+matches the `date:` field, and the slug becomes the URL. All four fields above are
+required; `categories` is optional.
+
+Write the entry here. Code fences, images and tables all work; put any images in
+`notes/posts/images/` and reference them as `images/foo.png`.

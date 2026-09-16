@@ -1,0 +1,52 @@
+<%
+// The full entry list below the cards on /notes/: date in a left column,
+// title and description on the right, a rule between rows.
+//
+// Four things about this template engine, all learned the hard way:
+//   * the equals-sign delimiter is the RAW interpolation here and the
+//     hyphen one escapes -- the opposite way round from classic EJS;
+//   * the whitespace-trimming close delimiter is a syntax error;
+//   * each code block gets its own scope, so a variable declared in one is
+//     gone by the next -- hence the single self-contained expression below;
+//   * a close delimiter inside a comment still closes the block, so do not
+//     write the delimiters out in one of these comments.
+// The output also goes back through Pandoc as markdown, so indented tags turn
+// into a code block and a blank line between tags splits the HTML into
+// paragraphs: build one string, print it on one line.
+%>
+<%= (function () {
+  var fmt = function (d) {
+    if (!d) return "";
+    var dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString("en-GB", {
+      day: "numeric", month: "short", year: "numeric", timeZone: "UTC"
+    });
+  };
+
+  if (!items.length) {
+    return '<p class="gm-empty">The first entries are in preparation.</p>';
+  }
+
+  var out = items.map(function (item) {
+    var meta = "";
+    if (item.author) meta += '<span class="gm-row-author">' + item.author + '</span>';
+    if (item.categories && item.categories.length) {
+      meta += item.categories.map(function (c) {
+        return '<span class="gm-cat">' + c + '</span>';
+      }).join("");
+    }
+
+    var body = '<span class="gm-row-title">' + item.title + '</span>';
+    if (item.description) {
+      body += '<span class="gm-row-desc">' + item.description + '</span>';
+    }
+    if (meta) body += '<span class="gm-row-meta">' + meta + '</span>';
+
+    return '<a class="gm-row" href="' + item.path + '">'
+      + '<span class="gm-row-date">' + fmt(item.date) + '</span>'
+      + '<span class="gm-row-main">' + body + '</span></a>';
+  }).join("");
+
+  return '<div class="gm-rowlist">' + out + '</div>';
+})() %>

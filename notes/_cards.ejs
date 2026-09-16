@@ -1,0 +1,94 @@
+<%
+// The two entry cards at the top of /notes/: "Latest" shows one entry in
+// full and cycles back through older ones; "Earlier" is a three-row list of
+// everything behind the newest. Both rotate via _includes/gm-ticker.html.
+//
+// Four things about this template engine, all learned the hard way:
+//   * the equals-sign delimiter is the RAW interpolation here and the
+//     hyphen one escapes -- the opposite way round from classic EJS;
+//   * the whitespace-trimming close delimiter is a syntax error;
+//   * each code block gets its own scope, so a variable declared in one is
+//     gone by the next -- hence the single self-contained expression below;
+//   * a close delimiter inside a comment still closes the block, so do not
+//     write the delimiters out in one of these comments.
+// The output also goes back through Pandoc as markdown, so indented tags turn
+// into a code block and a blank line between tags splits the HTML into
+// paragraphs: build one string, print it on one line.
+%>
+<%= (function () {
+  var fmt = function (d, style) {
+    if (!d) return "";
+    var dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString("en-GB", {
+      day: "numeric", month: style === "short" ? "short" : "long",
+      year: "numeric", timeZone: "UTC"
+    });
+  };
+
+  var cats = function (item) {
+    if (!item.categories || !item.categories.length) return "";
+    return '<span class="gm-item-cats">' + item.categories.map(function (c) {
+      return '<span class="gm-cat">' + c + '</span>';
+    }).join("") + '</span>';
+  };
+
+  // One full entry, the Latest card's unit.
+  var feature = function (item) {
+    var out = '<a class="gm-feature" href="' + item.path + '">';
+    out += '<span class="gm-feature-date">' + fmt(item.date) + '</span>';
+    out += '<span class="gm-feature-title">' + item.title + '</span>';
+    if (item.author) {
+      out += '<span class="gm-feature-author">' + item.author + '</span>';
+    }
+    if (item.description) {
+      out += '<span class="gm-feature-desc">' + item.description + '</span>';
+    }
+    out += cats(item) + '</a>';
+    return out;
+  };
+
+  // One compact row, the Earlier card's unit: date left, title right.
+  var row = function (item) {
+    return '<a class="gm-row gm-row--card" href="' + item.path + '">'
+      + '<span class="gm-row-date">' + fmt(item.date, "short") + '</span>'
+      + '<span class="gm-row-title">' + item.title + '</span>'
+      + '</a>';
+  };
+
+  var empty = function (heading, note) {
+    return '<div class="gm-card"><span class="gm-card-head">' + heading
+      + '</span><p class="gm-empty">' + note + '</p></div>';
+  };
+
+  if (!items.length) {
+    return '<div class="gm-cards">'
+      + empty("Latest", "The first entries are in preparation.")
+      + empty("Earlier", "Entries will collect here as they are published.")
+      + '</div>';
+  }
+
+  var latest = '<div class="gm-card" data-gm-ticker data-gm-ticker-sync="entries" data-rows="1">'
+    + '<span class="gm-card-head">Latest</span>'
+    + '<div class="gm-ticker"><div class="gm-ticker-track">'
+    + items.map(feature).join("")
+    + '</div></div></div>';
+
+  // Earlier trails Latest by one entry. Once there are enough entries for it
+  // to rotate, it carries the whole list -- starting one along, and wrapping
+  // the newest round to the end -- so that it and Latest share a cycle length
+  // and can never land on the same entry. Below that, it is simply whatever
+  // is left after the newest, and nothing rotates.
+  var rest = items.slice(1);
+  if (rest.length > 3) rest = rest.concat(items.slice(0, 1));
+
+  var earlier = rest.length
+    ? '<div class="gm-card" data-gm-ticker data-gm-ticker-sync="entries" data-rows="3">'
+        + '<span class="gm-card-head">Earlier</span>'
+        + '<div class="gm-ticker"><div class="gm-ticker-track">'
+        + rest.map(row).join("")
+        + '</div></div></div>'
+    : empty("Earlier", "Older entries will appear here once there are some.");
+
+  return '<div class="gm-cards">' + latest + earlier + '</div>';
+})() %>

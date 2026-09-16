@@ -48,6 +48,15 @@ jobs:
       - name: Restore R packages (renv)
         uses: r-lib/actions/setup-renv@v2
 
+      # Rebuilds notes/_journals-*.qmd from Crossref. continue-on-error is the
+      # point: a Crossref outage must not fail a deploy -- the partials
+      # committed to the repo are rendered instead, and their "Updated" line
+      # shows the page is stale. The monthly cron above is what makes this a
+      # monthly feed; no separate schedule is needed.
+      - name: Refresh journal feed (Crossref)
+        continue-on-error: true
+        run: python3 _scripts/fetch-journals.py
+
       - name: Render
         run: quarto render
 
