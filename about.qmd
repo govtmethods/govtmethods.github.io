@@ -6,8 +6,6 @@ toc: false
 
 Government Methods is a student-run initiative in the Department of Government at Georgetown University. Maintained by graduate students and supported by the Department, it gathers the tools, workflows, code, and conceptual frameworks we repeatedly return to in our research and teaching. The aim is not to create a comprehensive methods encyclopedia, but to build a shared working archive — careful, reproducible, and evolving — that strengthens how we design, implement, and communicate political science research.
 
-**Web editor:** Parushya
-
 ---
 
 ## Methods Brown Bag
@@ -16,7 +14,7 @@ A recurring workshop series where graduate students present tools, workflows, an
 
 **Organizers**
 
-- Season 2 (2026–27): Sara Mohammadi, Sieun
+- Season 2 (2026–27): Sara Mohammadi, Sieun Sim
 - Season 1 (2025–26): Parushya, Sara Mohammadi
 
 **Sessions and presenters**
